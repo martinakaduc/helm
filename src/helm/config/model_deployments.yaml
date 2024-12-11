@@ -2881,3 +2881,24 @@ model_deployments:
       class_name: "helm.clients.huggingface_client.HuggingFaceClient"
     args:
       pretrained_model_name_or_path: maritaca-ai/sabia-7b
+
+# ViLLM
+  - name: huggingface/ura-llama-2.1-8b
+    model_name: ura-hcmut/ura-llama-2.1-8b
+    tokenizer_name: meta/llama-3.1-8b
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+      args:
+        device_map: auto
+        torch_dtype: torch.bfloat16
+
+  - name: huggingface/ura-llama-2-8b
+    model_name: ura-hcmut/ura-llama-2-8b
+    tokenizer_name: meta/llama-3.1-8b
+    max_sequence_length: 8192
+    client_spec:
+      class_name: "helm.clients.together_client.HuggingFaceClient"
+      args:
+        device_map: auto
+        torch_dtype: torch.bfloat16

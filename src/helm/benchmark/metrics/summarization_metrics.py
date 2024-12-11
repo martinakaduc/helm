@@ -97,6 +97,10 @@ class SummarizationMetric(Metric):
             dataset = "cnndm"
         elif "xsum" in self.task:
             dataset = "xsum"
+        elif "vietnews" in self.task:
+            dataset = "vietnews"
+        elif "wiki_lingua" in self.task:
+            dataset = "wiki_lingua"
         else:
             raise ValueError
 
