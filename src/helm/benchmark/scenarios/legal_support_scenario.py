@@ -97,6 +97,7 @@ class LegalSupportScenario(Scenario):
                     input=Input(text=passage),
                     references=list(map(answer_to_reference, answers)),
                     split=splits[split],
+                    extra_data={"difficulty": np.random.randn()}
                 )
 
                 instances.append(instance)

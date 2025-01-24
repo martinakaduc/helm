@@ -539,7 +539,7 @@ class MSMARCOScenario(Scenario):
             reference = self.create_reference(docid, gold, rel, rank)
             references.append(reference)
 
-        return Instance(Input(text=query_dict[qid]), references=references, split=split)
+        return Instance(Input(text=query_dict[qid]), references=references, split=split, extra_data={"difficulty": np.random.randn()})
 
     def get_train_instance(self, qid: int) -> Instance:
         """Create and return a train instance for the given qid.

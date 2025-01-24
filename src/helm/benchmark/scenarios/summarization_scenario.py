@@ -167,6 +167,7 @@ class SummarizationScenario(Scenario):
                         input=Input(text=article),
                         references=[Reference(Output(text=summary), tags=[CORRECT_TAG])],
                         split=split,
+                        extra_data={"difficulty": np.random.randn()}
                     )
                 )
 

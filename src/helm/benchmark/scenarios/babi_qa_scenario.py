@@ -99,6 +99,7 @@ class BabiQAScenario(Scenario):
             self.tasks = [task]
 
     def get_instances(self, output_path: str) -> List[Instance]:
+        import numpy as np
         data_path = os.path.join(output_path, "data")
         ensure_directory_exists(data_path)
 
@@ -133,6 +134,7 @@ class BabiQAScenario(Scenario):
                                 input=PassageQuestionInput(passage="".join(story), question=question, separator=""),
                                 references=[Reference(Output(text=answer), tags=[CORRECT_TAG])],
                                 split=splits[split],
+                                extra_data={"difficulty": np.random.randn()}
                             )
                             instances.append(instance)
                         else:

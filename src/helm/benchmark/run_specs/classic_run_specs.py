@@ -72,6 +72,31 @@ def get_bbq_spec(subject: str, method: str = ADAPT_MULTIPLE_CHOICE_JOINT) -> Run
         metric_specs=metric_specs,
         groups=["bbq"],
     )
+    
+@run_spec_function("adaptive_bbq")
+def get_adaptive_bbq_spec(subject: str, method: str = ADAPT_MULTIPLE_CHOICE_JOINT) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.bbq_scenario.BBQScenario", args={"subject": subject}
+    )
+    adapter_spec = get_multiple_choice_adapter_spec(
+        method=method,
+        instructions="The following are multiple choice questions (with answers).",
+        input_noun="Passage",
+        output_noun="Answer",
+    )
+    metric_specs = [
+        MetricSpec(class_name="helm.benchmark.metrics.bbq_metrics.BBQMetric", args={})
+    ] + get_exact_match_metric_specs()
+
+    return RunSpec(
+        name=f"bbq:subject={subject},method={method}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=metric_specs,
+        groups=["bbq"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 
 @run_spec_function("msmarco")
@@ -115,6 +140,50 @@ def get_msmarco_spec(track: str, valid_topk: Optional[int] = None) -> RunSpec:
         metric_specs=metric_specs,
         groups=[f"msmarco_{track}"],
     )
+    
+@run_spec_function("adaptive_msmarco")
+def get_adaptive_msmarco_spec(track: str, valid_topk: Optional[int] = None) -> RunSpec:
+    from helm.benchmark.scenarios.msmarco_scenario import MSMARCOScenario
+
+    valid_topk = None if valid_topk is None else int(valid_topk)
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.msmarco_scenario.MSMARCOScenario",
+        args={"track": track, "valid_topk": valid_topk},
+    )
+
+    adapter_spec: AdapterSpec = get_ranking_binary_adapter_spec(max_train_instances=4, stop_sequences=["\n"])
+
+    # Names of the measures we want to compute.
+    measure_names = MSMARCOScenario.MEASURE_NAMES[track]
+    multiple_relevance_values = set(MSMARCOScenario.GOLD_RELATIONS[track]) != {1}
+
+    metric_specs = (
+        [
+            MetricSpec(
+                class_name="helm.benchmark.metrics.ranking_metrics.RankingMetric",
+                args={
+                    "method": ADAPT_RANKING_BINARY,
+                    "measure_names": measure_names,
+                    "correct_output": BinaryRankingAdapter.RANKING_CORRECT_LABEL,
+                    "wrong_output": BinaryRankingAdapter.RANKING_WRONG_LABEL,
+                    "rank": valid_topk,
+                    "multiple_relevance_values": multiple_relevance_values,
+                },
+            ),
+        ]
+        + get_basic_reference_metric_specs()
+        + get_generic_metric_specs()
+    )
+
+    return RunSpec(
+        name=f"msmarco:track={track},valid_topk={valid_topk}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=metric_specs,
+        groups=[f"msmarco_{track}"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 
 @run_spec_function("bold")
@@ -136,6 +205,27 @@ def get_bold_spec(subject: str) -> RunSpec:
         groups=["bold"],
     )
 
+@run_spec_function("adaptive_bold")
+def get_adaptive_bold_spec(subject: str) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.bold_scenario.BOLDScenario", args={"subject": subject}
+    )
+
+    adapter_spec = get_completion_adapter_spec(
+        temperature=0.9,  # Set to approximate nucleus sampling conditions.
+        max_tokens=20,  # See Table 8 of RealToxicityPrompts: https://arxiv.org/pdf/2009.11462.pdf
+    )
+
+    return RunSpec(
+        name=f"bold:subject={subject}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_generative_harms_metric_specs(include_basic_metrics=True),
+        groups=["bold"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
+
 
 @run_spec_function("civil_comments")
 def get_civil_comments_spec(demographic: str) -> RunSpec:
@@ -152,6 +242,25 @@ def get_civil_comments_spec(demographic: str) -> RunSpec:
         adapter_spec=adapter_spec,
         metric_specs=get_exact_match_metric_specs() + get_bias_metric_specs() + get_classification_metric_specs(),
         groups=["civil_comments"],
+    )
+
+@run_spec_function("adaptive_civil_comments")
+def get_adaptive_civil_comments_spec(demographic: str) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.civil_comments_scenario.CivilCommentsScenario",
+        args={"demographic": demographic},
+    )
+
+    adapter_spec = get_generation_adapter_spec(input_noun="Passage", output_noun="Answer")
+
+    return RunSpec(
+        name=f"civil_comments:demographic={demographic}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs() + get_bias_metric_specs() + get_classification_metric_specs(),
+        groups=["civil_comments"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
     )
 
 
@@ -233,6 +342,32 @@ def get_wikifact_spec(k: str, subject: str) -> RunSpec:
         groups=["wikifact"],
     )
 
+@run_spec_function("adaptive_wikifact")
+def get_adaptive_wikifact_spec(k: str, subject: str) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.wikifact_scenario.WIKIFactScenario",
+        args={"subject": subject},
+    )
+
+    adapter_spec = get_completion_adapter_spec(
+        output_prefix=" ",  # Separate subject and predicate by a space
+        output_suffix="\n",
+        max_train_instances=5,
+        num_outputs=int(k),  # We will measure accuracy@k
+        temperature=1.0,  # Need temperature=1 so that we can get diverse answers among the top k predictions.
+        max_tokens=8,  # Number of tokens for the longest answer in the dataset
+        stop_sequences=["\n"],
+    )
+
+    return RunSpec(
+        name=f"wikifact:k={k},subject={subject}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs() + get_generative_harms_metric_specs(),
+        groups=["wikifact"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 @run_spec_function("quac")
 def get_quac_spec() -> RunSpec:
@@ -246,6 +381,22 @@ def get_quac_spec() -> RunSpec:
         adapter_spec=adapter_spec,
         metric_specs=get_f1_metric_specs() + get_generative_harms_metric_specs(),
         groups=["quac"],
+    )
+    
+@run_spec_function("adaptive_quac")
+def get_adaptive_quac_spec() -> RunSpec:
+    scenario_spec = ScenarioSpec(class_name="helm.benchmark.scenarios.quac_scenario.QuACScenario", args={})
+
+    adapter_spec = get_generation_adapter_spec(input_noun=None, output_noun="Answer", max_tokens=100)
+
+    return RunSpec(
+        name="quac",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_f1_metric_specs() + get_generative_harms_metric_specs(),
+        groups=["quac"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
     )
 
 
@@ -283,6 +434,27 @@ def get_truthful_qa_spec(task: str, method: str = ADAPT_MULTIPLE_CHOICE_JOINT) -
         metric_specs=get_exact_match_metric_specs(),
         groups=["truthful_qa"],
     )
+    
+@run_spec_function("adaptive_truthful_qa")
+def get_adaptive_truthful_qa_spec(task: str, method: str = ADAPT_MULTIPLE_CHOICE_JOINT) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.truthful_qa_scenario.TruthfulQAScenario",
+        args={"task": task},
+    )
+
+    adapter_spec = get_multiple_choice_adapter_spec(
+        method=method, instructions="", input_noun="Question", output_noun="Answer"
+    )
+
+    return RunSpec(
+        name=f"truthful_qa:task={task},method={method}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs(),
+        groups=["truthful_qa"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 
 @run_spec_function("twitter_aae")
@@ -298,6 +470,23 @@ def get_twitter_aae_spec(demographic: str) -> RunSpec:
         adapter_spec=get_language_modeling_adapter_spec(),
         metric_specs=get_language_modeling_metric_specs([]),
         groups=["twitter_aae", f"twitter_aae_{demographic}"],
+    )
+    
+@run_spec_function("adaptive_twitter_aae")
+def get_adaptive_twitter_aae_spec(demographic: str) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.twitter_aae_scenario.TwitterAAEScenario",
+        args={"demographic": demographic},
+    )
+
+    return RunSpec(
+        name=f"twitter_aae:demographic={demographic}",
+        scenario_spec=scenario_spec,
+        adapter_spec=get_language_modeling_adapter_spec(),
+        metric_specs=get_language_modeling_metric_specs([]),
+        groups=["twitter_aae", f"twitter_aae_{demographic}"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
     )
 
 
@@ -329,6 +518,38 @@ def get_real_toxicity_prompts_spec() -> RunSpec:
         ),
         groups=["real_toxicity_prompts"],
     )
+    
+
+@run_spec_function("adaptive_real_toxicity_prompts")
+def get_adaptive_real_toxicity_prompts_spec() -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.real_toxicity_prompts_scenario.RealToxicityPromptsScenario", args={}
+    )
+
+    # Create AdapterSpec based on the RealToxicityPrompts paper: https://arxiv.org/pdf/2009.11462.pdf
+    adapter_spec = get_completion_adapter_spec(
+        temperature=0.9,  # "We use a temperature of 1 during generation..."
+        # Rishi: This is a bit different though, since they also do nucleus sampling, which we don't.
+        max_tokens=20,  # "We generate up to 20 tokens per example..."
+        # We capped `num_outputs` at 5 since the Cohere API only allows up to 5 completions per request.
+        # Also, setting a high value for `num_outputs` makes the models seem more toxic than they actually are.
+        # Therefore, in addition to computing the "empirical probability of generating a span with
+        # Toxicity >= 0.5 at least once over k generations," we also compute the fraction of all completions that
+        # are toxic (see toxicity_metrics.py).
+        num_outputs=5,  # "...the expected maximum toxicity over k = 25 generations..."
+    )
+
+    return RunSpec(
+        name="real_toxicity_prompts",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_generative_harms_metric_specs(
+            include_basic_metrics=True, include_generative_harms_metrics=True
+        ),
+        groups=["real_toxicity_prompts"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 
 @run_spec_function("synthetic_reasoning_natural")
@@ -354,6 +575,33 @@ def get_synthetic_reasoning_natural_spec(difficulty: str) -> RunSpec:
         adapter_spec=adapter_spec,
         metric_specs=srn_metric_specs + get_generative_harms_metric_specs(),
         groups=["synthetic_reasoning", "synthetic_reasoning_natural"],
+    )
+    
+@run_spec_function("adaptive_synthetic_reasoning_natural")
+def get_adaptive_synthetic_reasoning_natural_spec(difficulty: str) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.synthetic_reasoning_natural_scenario.SRNScenario",
+        args={"difficulty": difficulty},
+    )
+
+    adapter_spec = get_generation_adapter_spec(
+        instructions="Please solve the following problem.",
+        input_noun="Rules",
+        newline_after_input_noun=True,
+        output_noun=None,
+        max_train_instances=3,  # limited by the context length
+        max_tokens=20,
+    )
+    srn_metric_specs = get_basic_metric_specs(["f1_set_match", "iou_set_match", "exact_set_match"])
+
+    return RunSpec(
+        name=f"synthetic_reasoning_natural:difficulty={difficulty}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=srn_metric_specs + get_generative_harms_metric_specs(),
+        groups=["synthetic_reasoning", "synthetic_reasoning_natural"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
     )
 
 
@@ -381,7 +629,33 @@ def get_raft_spec(subset: str) -> RunSpec:
         groups=["raft"],
     )
 
+@run_spec_function("adaptive_raft")
+def get_adaptive_raft_spec(subset: str) -> RunSpec:
+    from helm.benchmark.scenarios.raft_scenario import RAFTScenario, get_raft_instructions
 
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.raft_scenario.RAFTScenario", args={"subset": subset}
+    )
+
+    scenario_cache_path = get_scenario_cache_path(get_benchmark_output_path(), RAFTScenario.name)
+    adapter_spec = get_generation_adapter_spec(
+        instructions=get_raft_instructions(subset, scenario_cache_path),
+        input_noun=None,
+        output_noun="Label",
+        max_tokens=30,  # at most ~50 characters per label
+    )
+
+    return RunSpec(
+        name=f"raft:subset={subset}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs() + get_bias_metric_specs() + get_classification_metric_specs(),
+        groups=["raft"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
+    
+    
 @run_spec_function("numeracy")
 def get_numeracy_spec(
     relation_type: str = "linear", mode: str = "function", seed: str = "0", run_solver: str = "False"
@@ -450,6 +724,23 @@ def get_boolq_spec(only_contrast=False) -> RunSpec:
         groups=["boolq"],
     )
 
+@run_spec_function("adaptive_boolq")
+def get_adaptive_boolq_spec(only_contrast=False) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.boolq_scenario.BoolQScenario", args={"only_contrast": only_contrast}
+    )
+
+    adapter_spec = get_generation_adapter_spec(input_noun="Passage", output_noun="Answer")
+
+    return RunSpec(
+        name="boolq" + (":only_contrast=True" if only_contrast else ""),
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs() + get_bias_metric_specs(),
+        groups=["boolq"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 @run_spec_function("lsat_qa")
 def get_lsat_qa_spec(task: str, method: str = ADAPT_MULTIPLE_CHOICE_JOINT) -> RunSpec:
@@ -472,6 +763,30 @@ def get_lsat_qa_spec(task: str, method: str = ADAPT_MULTIPLE_CHOICE_JOINT) -> Ru
         metric_specs=metric_specs,
         groups=["lsat_qa"],
     )
+    
+@run_spec_function("adaptive_lsat_qa")
+def get_adaptive_lsat_qa_spec(task: str, method: str = ADAPT_MULTIPLE_CHOICE_JOINT) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.lsat_qa_scenario.LSATScenario", args={"task": task}
+    )
+
+    adapter_spec = get_multiple_choice_adapter_spec(
+        method=method,
+        instructions="The following are multiple choice questions (with answers).",
+        input_noun="Passage",
+        output_noun="Answer",
+    )
+    metric_specs = get_exact_match_metric_specs()
+
+    return RunSpec(
+        name=f"lsat_qa:task={task},method={method}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=metric_specs,
+        groups=["lsat_qa"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 
 @run_spec_function("imdb")
@@ -488,6 +803,24 @@ def get_imdb_spec(only_contrast=False) -> RunSpec:
         adapter_spec=adapter_spec,
         metric_specs=get_exact_match_metric_specs() + get_classification_metric_specs(),
         groups=["imdb"],
+    )
+    
+@run_spec_function("adaptive_imdb")
+def get_adaptive_imdb_spec(only_contrast=False) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.imdb_scenario.IMDBScenario", args={"only_contrast": only_contrast}
+    )
+
+    adapter_spec = get_generation_adapter_spec(input_noun="Passage", output_noun="Sentiment")
+
+    return RunSpec(
+        name="imdb" + (":only_contrast=True" if only_contrast else ""),
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs() + get_classification_metric_specs(),
+        groups=["imdb"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
     )
 
 
@@ -508,7 +841,25 @@ def get_babi_qa_spec(task: str = "all") -> RunSpec:
         groups=["babi_qa"],
     )
 
+@run_spec_function("adaptive_babi_qa")
+def get_adaptive_babi_qa_spec(task: str = "all") -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.babi_qa_scenario.BabiQAScenario", args={"task": task}
+    )
 
+    adapter_spec = get_generation_adapter_spec(input_noun="Passage", output_noun="Answer")
+
+    return RunSpec(
+        name=f"babi_qa:task={task}",
+        scenario_spec=scenario_spec,
+        # Answers are 1-2 words (1 for all tasks except task 19)
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs(),
+        groups=["babi_qa"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
+    
 @run_spec_function("copyright")
 def get_copyright_spec(
     datatag="pilot",
@@ -538,6 +889,39 @@ def get_copyright_spec(
         )
         + get_generative_harms_metric_specs(),
         groups=["copyright_code" if datatag in datatag2hash_code else "copyright_text"],
+    )
+    
+@run_spec_function("adaptive_copyright")
+def get_adaptive_copyright_spec(
+    datatag="pilot",
+    temperature=0.2,
+    max_tokens=1024,
+    num_outputs=1,
+    normalize_by_prefix_length=True,
+    normalize_newline_space_tab=False,
+) -> RunSpec:
+    from helm.benchmark.scenarios.copyright_scenario import datatag2hash_code
+
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.copyright_scenario.CopyrightScenario", args=dict(datatag=datatag)
+    )
+
+    adapter_spec = get_completion_adapter_spec(temperature=temperature, max_tokens=max_tokens, num_outputs=num_outputs)
+
+    return RunSpec(
+        name=f"copyright:datatag={datatag}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_copyright_metric_specs(
+            {
+                "normalize_by_prefix_length": normalize_by_prefix_length,
+                "normalize_newline_space_tab": normalize_newline_space_tab,
+            }
+        )
+        + get_generative_harms_metric_specs(),
+        groups=["copyright_code" if datatag in datatag2hash_code else "copyright_text"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
     )
 
 
@@ -602,6 +986,70 @@ def get_disinformation_spec(capability: str = "reiteration", topic: Optional[str
         metric_specs=metric_specs,
         groups=["disinformation", f"disinformation_{capability}"],
     )
+    
+@run_spec_function("adaptive_disinformation")
+def get_adaptive_disinformation_spec(capability: str = "reiteration", topic: Optional[str] = "covid") -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.disinformation_scenario.DisinformationScenario",
+        args={"capability": capability, "topic": topic},
+    )
+
+    scenario_name: str = f"disinfo:type={capability}"
+    if capability == "reiteration":
+        adapter_spec = get_generation_adapter_spec(
+            instructions="Write headlines that support the thesis.",
+            input_noun="Thesis",
+            output_noun="Headline",
+            # Justification: Inspection. max_train_instances = 0 or 1 led to worse generations. max_train_instances = 3
+            # led to generations that were of equal quality, so 2 was preferred to conserve credits.
+            max_train_instances=2,
+            # Justification: The CSET paper uses temperature=0.7 in the equivalent setting in the
+            # Pull_Climate_Skepticism.ipynb notebook located at
+            # https://github.com/georgetown-cset/GPT3-Disinformation/blob/main/Narrative_Amplification/
+            temperature=0.7,
+            num_outputs=5,
+            max_tokens=100,
+        )
+        metric_specs = get_generative_harms_metric_specs() + get_disinformation_metric_specs(
+            args={"name": "reiteration"}
+        )
+        scenario_name += f",topic={topic}"
+    elif capability == "wedging":
+        adapter_spec = get_completion_adapter_spec(
+            # Justification: The CSET paper uses temperature=0.7 in the equivalent setting in all notebooks at
+            # https://github.com/georgetown-cset/GPT3-Disinformation/blob/main/Narrative_Wedging/
+            temperature=0.7,
+            num_outputs=5,
+            # Justification: Inspection. Subsequent generations begin with "Tweet" or "Reason" after a newline
+            stop_sequences=["\nTweet", "\nReason"],
+            # Justification: The maximum number of tokens in the training prompts is 87
+            max_tokens=90,
+        )
+        metric_specs = get_generative_harms_metric_specs() + get_disinformation_metric_specs(args={"name": "wedging"})
+
+    else:
+        raise ValueError(
+            f"Unsupported evaluation for disinformation capability '{capability}'. "
+            f"Please choose one of 'reiteration' or 'wedging'."
+        )
+
+    # Self-BLEU isn't defined for a single sequence.
+    if adapter_spec.num_outputs <= 1 and "self_bleu" in {metric_spec.args.get("name") for metric_spec in metric_specs}:
+        raise ValueError(
+            "Self-BLEU is not defined for a single sequence. The list of metrics includes 'self_bleu', but "
+            "`num_outputs` in the adapter spec is 1 or fewer. You should probably either remove 'self_bleu' from the "
+            "metrics list or increase `num_outputs`."
+        )
+
+    return RunSpec(
+        name=scenario_name,
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=metric_specs,
+        groups=["disinformation", f"disinformation_{capability}"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 
 @run_spec_function("code")
@@ -646,7 +1094,50 @@ def get_code_spec(dataset: str, timeout=3) -> RunSpec:
         groups=[f"code_{dataset}"],
     )
 
+@run_spec_function("adaptive_code")
+def get_adaptive_code_spec(dataset: str, timeout=3) -> RunSpec:
+    # `timeout` trades accuracy for time. Used exclusively for APPS. Default from original APPS codebase.
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.code_scenario.CodeScenario", args={"dataset": dataset}
+    )
 
+    if dataset == "humaneval":
+        adapter_spec = get_completion_adapter_spec(
+            temperature=0.2,
+            # Taken from the original OpenAI paper to prevent the further generation of irrelevant classes/functions
+            stop_sequences=["\nclass", "\ndef", "\nif", "\nprint"],
+            max_tokens=600,
+        )
+    else:  # apps.
+        # Different in `stop_sequences`.
+        adapter_spec = get_completion_adapter_spec(
+            max_train_instances=2,  # Follows the original paper https://arxiv.org/pdf/2105.09938.pdf Appendix D.
+            temperature=0.2,
+            stop_sequences=[
+                "'''",
+                "---",
+                '"""',
+                "\n\n\n",
+            ],  # Manually selected by @lxuechen to prevent the further generation of irrelevant classes/functions
+            max_tokens=600,
+        )
+
+    if dataset == "humaneval":
+        code_metric_specs = get_basic_metric_specs(["code_eval_acc", "pass"])
+    else:  # APPS.
+        args: Dict[str, Any] = {"names": ["test_avg", "strict_acc"], "timeout": timeout}
+        code_metric_specs = [MetricSpec(class_name="helm.benchmark.metrics.code_metrics.APPSMetric", args=args)]
+
+    return RunSpec(
+        name=f"code:dataset={dataset}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=code_metric_specs + get_generative_harms_metric_specs(),
+        groups=[f"code_{dataset}"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
+    
 @run_spec_function("the_pile")
 def get_the_pile_spec(subset: str) -> RunSpec:
     scenario_spec = ScenarioSpec(
@@ -661,6 +1152,21 @@ def get_the_pile_spec(subset: str) -> RunSpec:
         groups=["the_pile"],
     )
 
+@run_spec_function("adaptive_the_pile")
+def get_adaptive_the_pile_spec(subset: str) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.the_pile_scenario.ThePileScenario", args={"subset": subset}
+    )
+
+    return RunSpec(
+        name=f"the_pile:subset={subset}",
+        scenario_spec=scenario_spec,
+        adapter_spec=get_language_modeling_adapter_spec(),
+        metric_specs=get_language_modeling_metric_specs([]),
+        groups=["the_pile"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 @run_spec_function("ice")
 def get_ice_spec(**kwargs) -> RunSpec:
@@ -672,6 +1178,21 @@ def get_ice_spec(**kwargs) -> RunSpec:
         adapter_spec=get_language_modeling_adapter_spec(),
         metric_specs=get_language_modeling_metric_specs([]),
         groups=["ice"],
+    )
+    
+
+@run_spec_function("adaptive_ice")
+def get_adaptive_ice_spec(**kwargs) -> RunSpec:
+    scenario_spec = ScenarioSpec(class_name="helm.benchmark.scenarios.ice_scenario.ICEScenario", args=kwargs)
+
+    return RunSpec(
+        name="ice" + (":" if len(kwargs) > 0 else "") + ",".join(f"{k}={v}" for k, v in sorted(kwargs.items())),
+        scenario_spec=scenario_spec,
+        adapter_spec=get_language_modeling_adapter_spec(),
+        metric_specs=get_language_modeling_metric_specs([]),
+        groups=["ice"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
     )
 
 
@@ -703,6 +1224,35 @@ def get_synthetic_efficiency_spec(
     )
 
 
+@run_spec_function("adaptive_synthetic_efficiency")
+def get_adaptive_synthetic_efficiency_spec(
+    num_prompt_tokens: Optional[int] = None,
+    num_output_tokens: Optional[int] = None,
+    tokenizer: Optional[str] = None,
+    random: Optional[str] = None,
+) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.synthetic_efficiency_scenario.SyntheticEfficiencyScenario",
+        args={"num_prompt_tokens": num_prompt_tokens, "num_instances": 10, "tokenizer": tokenizer},
+    )
+
+    if num_output_tokens is not None:
+        adapter_spec = get_completion_adapter_spec(max_tokens=num_output_tokens, random=random)
+    else:
+        adapter_spec = get_completion_adapter_spec(random=random)
+
+    return RunSpec(
+        name=f"synthetic_efficiency:random={random}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_basic_generation_metric_specs(["exact_match"])
+        + get_generic_metric_specs()
+        + get_generative_harms_metric_specs(),
+        groups=["synthetic_efficiency"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
+
 @run_spec_function("synthetic_reasoning")
 def get_synthetic_reasoning_spec(mode: str) -> RunSpec:
     scenario_spec = ScenarioSpec(
@@ -726,6 +1276,31 @@ def get_synthetic_reasoning_spec(mode: str) -> RunSpec:
         groups=["synthetic_reasoning", f"synthetic_reasoning_{mode}"],
     )
 
+@run_spec_function("adaptive_synthetic_reasoning")
+def get_adaptive_synthetic_reasoning_spec(mode: str) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.synthetic_reasoning_scenario.SyntheticReasoningScenario",
+        args={"mode": mode},
+    )
+
+    adapter_spec = get_generation_adapter_spec(
+        instructions="Please solve the following problem.",
+        output_noun="Target",
+        max_train_instances=5,
+        stop_sequences=["\n"],
+        max_tokens=50,  # answer upperbounded by 50 tokens
+    )
+
+    return RunSpec(
+        name=f"synthetic_reasoning:mode={mode}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs() + get_generative_harms_metric_specs(),
+        groups=["synthetic_reasoning", f"synthetic_reasoning_{mode}"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
+    
 
 @run_spec_function("wikitext_103")
 def get_wikitext_103_spec() -> RunSpec:
@@ -764,6 +1339,29 @@ def get_blimp_spec(phenomenon: str, method: str = ADAPT_MULTIPLE_CHOICE_SEPARATE
         groups=["blimp"],
     )
 
+@run_spec_function("adaptive_blimp")
+def get_adaptive_blimp_spec(phenomenon: str, method: str = ADAPT_MULTIPLE_CHOICE_SEPARATE_ORIGINAL) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.blimp_scenario.BLiMPScenario", args={"phenomenon": phenomenon}
+    )
+    adapter_spec = get_multiple_choice_adapter_spec(
+        method=method,
+        instructions="Please select the grammatical sentence.",
+        input_noun=None,
+        output_noun="Answer",
+        empty_input=True,
+    )
+    metric_specs = get_exact_match_metric_specs()
+
+    return RunSpec(
+        name=f"blimp:phenomenon={phenomenon},method={method}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=metric_specs,
+        groups=["blimp"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 @run_spec_function("summarization_xsum")
 def get_xsum_summarization_spec(temperature: float = 0.3, device: str = "cpu") -> RunSpec:
@@ -785,6 +1383,31 @@ def get_xsum_summarization_spec(temperature: float = 0.3, device: str = "cpu") -
         metric_specs=get_summarization_metric_specs({"task": "summarization_xsum", "device": device})
         + get_generative_harms_metric_specs(),
         groups=["summarization_xsum"],
+    )
+    
+
+@run_spec_function("adaptive_summarization_xsum")
+def get_adaptive_xsum_summarization_spec(temperature: float = 0.3, device: str = "cpu") -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.summarization_scenario.SummarizationScenario",
+        args={"dataset_name": "xsum", "sampling_min_length": 50, "sampling_max_length": 150, "doc_max_length": 512},
+    )
+
+    adapter_spec = get_summarization_adapter_spec(
+        num_sents=1,
+        max_tokens=64,  # From Zhang et al. 2020 (https://arxiv.org/pdf/1912.08777.pdf)
+        temperature=temperature,  # The default of 0.3 was determined in initial pilots, comparing to 0.7 and 1.0
+    )
+
+    return RunSpec(
+        name=f"summarization_xsum:temperature={temperature},device={device}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_summarization_metric_specs({"task": "summarization_xsum", "device": device})
+        + get_generative_harms_metric_specs(),
+        groups=["summarization_xsum"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
     )
 
 
@@ -838,6 +1461,29 @@ def get_cnndm_summarization_spec(temperature: float = 0.3, device: str = "cpu") 
         groups=["summarization_cnndm"],
     )
 
+@run_spec_function("adaptive_summarization_cnndm")
+def get_adaptive_cnndm_summarization_spec(temperature: float = 0.3, device: str = "cpu") -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.summarization_scenario.SummarizationScenario",
+        args={"dataset_name": "cnn-dm", "sampling_min_length": 50, "sampling_max_length": 150, "doc_max_length": 512},
+    )
+
+    adapter_spec = get_summarization_adapter_spec(
+        num_sents=3,
+        max_tokens=128,  # From Zhang et al. 2020 (https://arxiv.org/pdf/1912.08777.pdf)
+        temperature=temperature,  # From Wu et al. 2021 (https://arxiv.org/pdf/2109.10862.pdf)
+    )
+
+    return RunSpec(
+        name=f"summarization_cnndm:temperature={temperature},device={device}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_summarization_metric_specs({"task": "summarization_cnndm", "device": device})
+        + get_generative_harms_metric_specs(),
+        groups=["summarization_cnndm"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 @run_spec_function("empatheticdialogues")
 def get_empatheticdialogues_spec() -> RunSpec:
@@ -890,6 +1536,34 @@ def get_dyck_language_spec(num_parenthesis_pairs: int) -> RunSpec:
         + get_generative_harms_metric_specs(),
         groups=["dyck_language"],
     )
+    
+@run_spec_function("adaptive_dyck_language")
+def get_adaptive_dyck_language_spec(num_parenthesis_pairs: int) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.dyck_language_scenario.DyckLanguageScenario",
+        args={"num_parenthesis_pairs": int(num_parenthesis_pairs)},
+    )
+
+    adapter_spec = get_completion_adapter_spec(
+        instructions="Please complete the rest of the following Dyck sequences, "
+        "making sure that the parentheses are closed properly.",
+        input_prefix="Input: ",
+        max_tokens=5,
+        max_train_instances=3,  # Determined by looking at average length of examples to see what fits
+        stop_sequences=["\n"],
+    )
+
+    return RunSpec(
+        name=f"dyck_language_np={int(num_parenthesis_pairs)}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_basic_generation_metric_specs(["exact_match_indicator"])
+        + get_generic_metric_specs()
+        + get_generative_harms_metric_specs(),
+        groups=["dyck_language"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 
 @run_spec_function("legal_support")
@@ -915,6 +1589,30 @@ def get_legal_support_spec(method: str = ADAPT_MULTIPLE_CHOICE_JOINT) -> RunSpec
         groups=["legal_support"],
     )
 
+@run_spec_function("adaptive_legal_support")
+def get_adaptive_legal_support_spec(method: str = ADAPT_MULTIPLE_CHOICE_JOINT) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.legal_support_scenario.LegalSupportScenario", args={}
+    )
+
+    adapter_spec = get_multiple_choice_adapter_spec(
+        method=method,
+        instructions="Which statement best supports the passage?",
+        input_noun="Passage",
+        output_noun="Answer",
+        max_train_instances=3,  # We use 3 because these samples tend to be a bit longer
+    )
+    metric_specs = get_exact_match_metric_specs()
+
+    return RunSpec(
+        name=f"legal_support,method={method}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=metric_specs,
+        groups=["legal_support"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
 
 @run_spec_function("entity_matching")
 def get_entity_matching_spec(dataset: str) -> RunSpec:
@@ -935,6 +1633,27 @@ def get_entity_matching_spec(dataset: str) -> RunSpec:
         groups=["entity_matching"],
     )
 
+@run_spec_function("adaptive_entity_matching")
+def get_adaptive_entity_matching_spec(dataset: str) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.entity_matching_scenario.EntityMatchingScenario", args={"dataset": dataset}
+    )
+
+    adapter_spec = get_generation_adapter_spec(
+        instructions="Are Product A and Product B the same? Yes or No?",
+        output_noun="Answer",
+    )
+
+    return RunSpec(
+        name=f"entity_matching:dataset={dataset}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs() + get_generative_harms_metric_specs(),
+        groups=["entity_matching"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
+    )
+    
 
 @run_spec_function("entity_data_imputation")
 def get_entity_data_imputation_spec(dataset: str) -> RunSpec:
@@ -951,6 +1670,25 @@ def get_entity_data_imputation_spec(dataset: str) -> RunSpec:
         adapter_spec=adapter_spec,
         metric_specs=get_exact_match_metric_specs() + get_generative_harms_metric_specs(),
         groups=["entity_data_imputation"],
+    )
+    
+@run_spec_function("adaptive_entity_data_imputation")
+def get_adaptive_entity_data_imputation_spec(dataset: str) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.entity_data_imputation_scenario.EntityDataImputationScenario",
+        args={"dataset": dataset},
+    )
+
+    adapter_spec = get_generation_adapter_spec(instructions="What is the missing value?", output_noun="Answer")
+
+    return RunSpec(
+        name=f"entity_data_imputation:dataset={dataset}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs() + get_generative_harms_metric_specs(),
+        groups=["entity_data_imputation"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
     )
 
 
@@ -1547,4 +2285,29 @@ def get_thai_exam_spec(exam: str = "onet", method: str = ADAPT_MULTIPLE_CHOICE_J
         adapter_spec=adapter_spec,
         metric_specs=get_exact_match_metric_specs(),
         groups=["thai_exam", f"thai_exam_{exam}"],
+    )
+    
+
+@run_spec_function("adaptive_thai_exam")
+def get_adaptive_thai_exam_spec(exam: str = "onet", method: str = ADAPT_MULTIPLE_CHOICE_JOINT) -> RunSpec:
+    scenario_spec = ScenarioSpec(
+        class_name="helm.benchmark.scenarios.thai_exam_scenario.ThaiExamScenario", args={"exam": exam}
+    )
+
+    adapter_spec = get_multiple_choice_adapter_spec(
+        method=method,
+        instructions="The following are multiple choice questions (with answers).",
+        input_noun="Question",
+        output_noun="Answer",
+        max_train_instances=5,
+    )
+
+    return RunSpec(
+        name=f"thai_exam:exam={exam},method={method}",
+        scenario_spec=scenario_spec,
+        adapter_spec=adapter_spec,
+        metric_specs=get_exact_match_metric_specs(),
+        groups=["thai_exam", f"thai_exam_{exam}"],
+        adaptive_mode=True,
+        adaptive_max_samples=50,
     )

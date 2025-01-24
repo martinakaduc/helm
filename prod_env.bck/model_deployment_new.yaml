@@ -1,0 +1,387 @@
+model_deployments:
+  - name: huggingface/qwen1.5-0.5b-chat
+    model_name: qwen/qwen1.5-0.5b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    client_spec:
+      class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+      args:
+        pretrained_model_name_or_path: Qwen/Qwen1.5-0.5B-Chat
+
+  - name: huggingface/qwen1.5-1.8b-chat
+    model_name: qwen/qwen1.5-1.8b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    client_spec:
+      class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+      args:
+        pretrained_model_name_or_path: Qwen/Qwen1.5-1.8B-Chat
+
+  - name: huggingface/qwen1.5-4b-chat
+    model_name: qwen/qwen1.5-4b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    client_spec:
+      class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+      args:
+        pretrained_model_name_or_path: Qwen/Qwen1.5-4B-Chat
+
+  - name: huggingface/qwen1.5-7b
+    model_name: qwen/qwen1.5-7b
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    client_spec:
+      class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+      args:
+        pretrained_model_name_or_path: qwen/qwen1.5-7b
+
+  - name: huggingface/qwen1.5-14b
+    model_name: qwen/qwen1.5-14b
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    client_spec:
+      class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+      args:
+        pretrained_model_name_or_path: qwen/qwen1.5-14b
+
+  - name: huggingface/qwen1.5-32b
+    model_name: qwen/qwen1.5-32b
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    client_spec:
+      class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+      args:
+        pretrained_model_name_or_path: qwen/qwen1.5-32b
+
+  - name: huggingface/qwen1.5-110b-chat
+    model_name: qwen/qwen1.5-110b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    client_spec:
+      class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+      args:
+        pretrained_model_name_or_path: qwen/qwen1.5-110b-chat
+
+
+  - name: huggingface/llama-2-7b
+    model_name: meta/llama-2-7b
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: meta-llama/llama-2-7b
+
+  - name: huggingface/llama-2-13b
+    model_name: meta/llama-2-13b
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: meta-llama/llama-2-13b
+
+
+  - name: huggingface/llama-2-70b
+    model_name: meta/llama-2-70b
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: meta-llama/llama-2-70b
+
+
+  - name: huggingface/chronos-hermes-13b
+    model_name: Austism/chronos-hermes-13b
+    tokenizer_name: Austism/chronos-hermes-13b
+    max_sequence_length: 2048
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: Austism/chronos-hermes-13b
+
+
+  - name: huggingface/MythoMax-L2-13b
+    model_name: Gryphe/MythoMax-L2-13b
+    tokenizer_name: Gryphe/MythoMax-L2-13b
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: Gryphe/MythoMax-L2-13b
+
+
+  - name: huggingface/Nous-Capybara-7B-V1.9
+    model_name: NousResearch/Nous-Capybara-7B-V1.9
+    tokenizer_name: mistralai/Mistral-7B-v0.1
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: NousResearch/Nous-Capybara-7B-V1.9
+
+
+  - name: huggingface/Nous-Hermes-2-Mistral-7B-DPO
+    model_name: NousResearch/Nous-Hermes-2-Mistral-7B-DPO
+    tokenizer_name: mistralai/Mistral-7B-v0.1
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: NousResearch/Nous-Hermes-2-Mistral-7B-DPO
+
+  - name: huggingface/Nous-Hermes-2-Mixtral-8x7B-DPO
+    model_name: NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO
+    tokenizer_name: mistralai/Mistral-7B-v0.1
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO
+  
+  - name: huggingface/Nous-Hermes-2-Mixtral-8x7B-SFT
+    model_name: NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT
+    tokenizer_name: mistralai/Mistral-7B-v0.1
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT
+
+  - name: huggingface/Nous-Hermes-2-Yi-34B
+    model_name: NousResearch/Nous-Hermes-2-Yi-34B
+    tokenizer_name: 01-ai/Yi-6B
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: NousResearch/Nous-Hermes-2-Yi-34B
+
+
+  - name: huggingface/Nous-Hermes-Llama2-13b
+    model_name: NousResearch/Nous-Hermes-Llama2-13b
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: NousResearch/Nous-Hermes-Llama2-13b
+
+  - name: huggingface/Nous-Hermes-Llama2-7b
+    model_name: NousResearch/Nous-Hermes-Llama2-7b
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: NousResearch/Nous-Hermes-Llama2-7b
+
+  - name: huggingface/Mistral-7B-OpenOrca
+    model_name: Open-Orca/Mistral-7B-OpenOrca
+    tokenizer_name: mistralai/Mistral-7B-v0.1
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: Open-Orca/Mistral-7B-OpenOrca
+
+  - name: huggingface/snowflake-arctic-instruct
+    model_name: snowflake/snowflake-arctic-instruct
+    tokenizer_name: snowflake/snowflake-arctic-instruct
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: snowflake/snowflake-arctic-instruct
+
+  - name: huggingface/Toppy-M-7B
+    model_name: Undi95/Toppy-M-7B
+    tokenizer_name: mistralai/Mistral-7B-v0.1
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: Undi95/Toppy-M-7B
+
+  - name: huggingface/WizardLM-13B-V1.2
+    model_name: WizardLM/WizardLM-13B-V1.2
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: WizardLMTeam/WizardLM-13B-V1.2
+
+  - name: huggingface/CodeLlama-7b-Instruct-hf
+    model_name: codellama/CodeLlama-7b-Instruct-hf
+    tokenizer_name: codellama/CodeLlama-7b-Instruct-hf
+    max_sequence_length: 16384
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: codellama/CodeLlama-7b-Instruct-hf
+
+  - name: huggingface/CodeLlama-13b-Instruct-hf
+    model_name: codellama/CodeLlama-13b-Instruct-hf
+    tokenizer_name: codellama/CodeLlama-7b-Instruct-hf
+    max_sequence_length: 16384
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: codellama/CodeLlama-13b-Instruct-hf
+
+  - name: huggingface/CodeLlama-34b-Instruct-hf
+    model_name: codellama/CodeLlama-34b-Instruct-hf
+    tokenizer_name: codellama/CodeLlama-7b-Instruct-hf
+    max_sequence_length: 16384
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: codellama/CodeLlama-34b-Instruct-hf
+
+  - name: huggingface/CodeLlama-70b-Instruct-hf
+    model_name: codellama/CodeLlama-70b-Instruct-hf
+    tokenizer_name: codellama/CodeLlama-7b-Instruct-hf
+    max_sequence_length: 16384
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: codellama/CodeLlama-70b-Instruct-hf
+
+  - name: huggingface/dolphin-2.5-mixtral-8x7b
+    model_name: cognitivecomputations/dolphin-2.5-mixtral-8x7b
+    tokenizer_name: mistralai/Mistral-7B-v0.1
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: cognitivecomputations/dolphin-2.5-mixtral-8x7b
+
+  - name: huggingface/deepseek-coder-33b-instruct
+    model_name: deepseek-ai/deepseek-coder-33b-instruct
+    tokenizer_name: deepseek-ai/deepseek-coder-33b-instruct
+    max_sequence_length: 16384
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: deepseek-ai/deepseek-coder-33b-instruct
+
+  - name: huggingface/Platypus2-70B-instruct
+    model_name: garage-bAInd/Platypus2-70B-instruct
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: garage-bAInd/Platypus2-70B-instruct
+
+  - name: huggingface/gemma-2b-it
+    model_name: google/gemma-2b-it
+    tokenizer_name: google/gemma-2b
+    max_sequence_length: 8192
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: google/gemma-2b-it
+
+  - name: huggingface/gemma-7b
+    model_name: google/gemma-7b
+    tokenizer_name: google/gemma-2b
+    max_sequence_length: 8192
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: google/gemma-7b
+
+  - name: huggingface/vicuna-7b-v1.5
+    model_name: lmsys/vicuna-7b-v1.5
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: lmsys/vicuna-7b-v1.5
+
+  - name: huggingface/vicuna-13b-v1.5
+    model_name: lmsys/vicuna-13b-v1.5
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: lmsys/vicuna-13b-v1.5
+
+
+  - name: huggingface/mistral-7b-v0.1
+    model_name: mistralai/mistral-7b-v0.1
+    tokenizer_name: mistralai/Mistral-7B-v0.1
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: mistralai/mistral-7b-v0.1
+
+  - name: huggingface/Mistral-7B-Instruct-v0.2
+    model_name: mistralai/Mistral-7B-Instruct-v0.2
+    tokenizer_name: mistralai/Mistral-7B-Instruct-v0.2
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: mistralai/Mistral-7B-Instruct-v0.2
+
+
+  - name: huggingface/openchat-3.5-1210
+    model_name: openchat/openchat-3.5-1210
+    tokenizer_name: openchat/openchat-3.5-1210
+    max_sequence_length: 8192
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: openchat/openchat-3.5-1210
+
+  - name: huggingface/Snorkel-Mistral-PairRM-DPO
+    model_name: snorkelai/Snorkel-Mistral-PairRM-DPO
+    tokenizer_name: mistralai/Mistral-7B-v0.1
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: snorkelai/Snorkel-Mistral-PairRM-DPO
+
+  - name: huggingface/OpenHermes-2-Mistral-7B
+    model_name: teknium/OpenHermes-2-Mistral-7B
+    tokenizer_name: teknium/OpenHermes-2-Mistral-7B
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: teknium/OpenHermes-2-Mistral-7B
+
+  - name: huggingface/OpenHermes-2.5-Mistral-7B
+    model_name: teknium/OpenHermes-2.5-Mistral-7B
+    tokenizer_name: teknium/OpenHermes-2-Mistral-7B
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: teknium/OpenHermes-2.5-Mistral-7B
+
+  - name: huggingface/StripedHyena-Nous-7B
+    model_name: togethercomputer/StripedHyena-Nous-7B
+    tokenizer_name: togethercomputer/StripedHyena-Nous-7B
+    max_sequence_length: 32768
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: togethercomputer/StripedHyena-Nous-7B
+
+  - name: huggingface/SOLAR-10.7B-Instruct-v1.0
+    model_name: upstage/SOLAR-10.7B-Instruct-v1.0
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4096
+    client_spec:
+        class_name: "helm.clients.huggingface_client.HuggingFaceClient"
+        args:
+          pretrained_model_name_or_path: upstage/SOLAR-10.7B-Instruct-v1.0

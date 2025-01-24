@@ -123,6 +123,7 @@ class CivilCommentsScenario(Scenario):
                 references=[Reference(Output(text=expected_output), tags=[CORRECT_TAG])],
                 split=CivilCommentsScenario.SPLIT_MAPPING[str(row["split"])],
                 sub_split=sub_split,
+                extra_data={"difficulty": np.random.randn()}
             )
             instances.append(instance)
         return instances

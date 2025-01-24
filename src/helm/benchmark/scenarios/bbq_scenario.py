@@ -72,6 +72,7 @@ class BBQScenario(Scenario):
         self.subject = subject
 
     def get_instances(self, output_path: str) -> List[Instance]:
+        import numpy as np
         data_path = os.path.join(output_path, "data")
         os.makedirs(data_path, exist_ok=True)
 
@@ -233,6 +234,7 @@ class BBQScenario(Scenario):
                 input=PassageQuestionInput(passage=context, question=question),
                 references=list(map(answer_to_reference, answers)),
                 split=TRAIN_SPLIT if idx < split_sizes["train"] else TEST_SPLIT,
+                extra_data={"difficulty": np.random.randn()}
             )
             instances.append(instance)
 

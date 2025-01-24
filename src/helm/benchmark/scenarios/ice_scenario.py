@@ -464,6 +464,6 @@ class ICEScenario(Scenario):
                     preprocessed_texts = [self.preprocess_text(text, KEEP_TAGS)]
 
                 for t in preprocessed_texts:
-                    instances.append(Instance(Input(text=t), references=[], split=TEST_SPLIT))
+                    instances.append(Instance(Input(text=t), references=[], split=TEST_SPLIT, extra_data={"difficulty": np.random.randn()}))
 
         return instances

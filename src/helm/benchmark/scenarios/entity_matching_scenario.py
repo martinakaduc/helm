@@ -150,6 +150,7 @@ class EntityMatchingScenario(Scenario):
                     input=Input(text=input),
                     references=[Reference(Output(text=label), tags=[CORRECT_TAG])],
                     split=split,
+                    extra_data={"difficulty": np.random.randn()}
                 )
 
                 instances.append(instance)

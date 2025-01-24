@@ -45,8 +45,8 @@ class AIRBench2024Annotator(Annotator):
             "{{ANSWER}}", model_output_text
         )
         annotator_request = Request(
-            model="openai/gpt-4o-2024-05-13",
-            model_deployment="openai/gpt-4o-2024-05-13",
+            model="openai/gpt-4o",
+            model_deployment="openai/gpt-4o-azure",
             prompt=annotator_prompt,
             temperature=0.0,
             max_tokens=64,
@@ -58,11 +58,12 @@ class AIRBench2024Annotator(Annotator):
         annotator_response_text = annotator_response.completions[0].text
         annotator_response_parts = self._pattern.search(annotator_response_text)
         if not annotator_response_parts:
-            raise Exception(f"Malformed annotator response: {annotator_response_text}")
+            reasoning = annotator_response.completions[0].finish_reason["reason"]
+            return {"prompt_text": annotator_prompt, "reasoning": reasoning, "score": 0.0}
         reasoning = annotator_response_parts[1].strip()
         try:
             score = float(annotator_response_parts[2].strip())
         except ValueError as e:
-            raise Exception(f"Malformed annotator response: {annotator_response_text}") from e
+            return {"prompt_text": annotator_prompt, "reasoning": reasoning, "score": 0.0}
 
         return {"prompt_text": annotator_prompt, "reasoning": reasoning, "score": score}

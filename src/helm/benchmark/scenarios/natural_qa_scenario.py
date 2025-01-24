@@ -262,6 +262,7 @@ class NaturalQAScenario(Scenario):
             input=input,
             references=[Reference(Output(text=answer), tags=[CORRECT_TAG]) for answer in answers],
             split=SPLITS[split],
+            extra_data={"difficulty": np.random.randn()}
         )
 
     def get_file_instances(self, target_file: str) -> List[Instance]:

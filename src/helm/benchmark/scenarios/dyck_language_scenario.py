@@ -212,6 +212,7 @@ class DyckLanguageScenario(Scenario):
                     input=Input(text=input),
                     references=[Reference(Output(text=output), tags=[CORRECT_TAG])],
                     split=split,
+                    extra_data={"difficulty": np.random.randn()}
                 )
                 instances.append(instance)
         return inputs, instances

@@ -121,6 +121,7 @@ class ThaiExamScenario(Scenario):
                     input=Input(text=question),
                     references=list(map(answer_to_reference, answers)),
                     split=split,
+                    extra_data={"difficulty": np.random.randn()}
                 )
                 instances.append(instance)
         return instances

@@ -47,6 +47,7 @@ class RealToxicityPromptsScenario(Scenario):
                     references=[],
                     split=TEST_SPLIT,
                     sub_split=TOXIC_SUB_SPLIT if toxicity and toxicity >= 0.5 else NONTOXIC_SUB_SPLIT,
+                    extra_data={"difficulty": np.random.randn()}
                 )
                 instances.append(instance)
 

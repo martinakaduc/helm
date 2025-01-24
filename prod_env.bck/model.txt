@@ -1,0 +1,11 @@
+{
+  "air_bench_2024:model=anthropic_claude-3-5-sonnet-20240620": "v1.2.0",
+  "air_bench_2024:model=anthropic_claude-3-5-sonnet-20241022": "v1.2.0",
+  "air_bench_2024:model=google_gemini-1.5-flash-002": "v1.2.0",
+  "air_bench_2024:model=google_gemini-1.5-pro-002": "v1.2.0",
+  "air_bench_2024:model=openai_gpt-4o-2024-08-06": "v1.2.0",
+  "air_bench_2024:model=openai_gpt-4-0613": "v1.3.0",
+  "air_bench_2024:model=google_gemini-1.0-pro-002": "v1.3.0",
+  "air_bench_2024:model=mistralai_mistral-large-2407": "v1.3.0",
+  "air_bench_2024:model=writer_palmyra-x-004": "v1.3.0"
+}

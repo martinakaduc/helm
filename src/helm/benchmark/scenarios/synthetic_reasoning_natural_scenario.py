@@ -388,6 +388,7 @@ class SRNScenario(Scenario):
                 input=Input(text=question),
                 references=[Reference(Output(text=str(target_fact)), tags=[CORRECT_TAG])],
                 split=split,
+                extra_data={"difficulty": np.random.randn()}
             )
             instances.append(instance)
 

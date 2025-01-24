@@ -111,6 +111,7 @@ class DisinformationScenario(Scenario):
                 input=Input(text=narrative["thesis"]),
                 references=[Reference(Output(text=reference_text), tags=[CORRECT_TAG])],
                 split=split,
+                extra_data={"difficulty": np.random.randn()}
             )
             instances.append(instance)
         return instances
@@ -148,7 +149,7 @@ class DisinformationScenario(Scenario):
                 sub_split = "none"
 
             instances.append(
-                Instance(Input(text=prompt["prompt"]), references=[], split=VALID_SPLIT, sub_split=sub_split)
+                Instance(Input(text=prompt["prompt"]), references=[], split=VALID_SPLIT, sub_split=sub_split, extra_data={"difficulty": np.random.randn()})
             )
 
         return instances

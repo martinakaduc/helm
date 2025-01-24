@@ -78,6 +78,7 @@ class CopyrightScenario(Scenario):
                     input=Input(text=prefix),
                     references=[Reference(Output(text=prefix_to_end), tags=[CORRECT_TAG])],
                     split=TEST_SPLIT,
+                    extra_data={"difficulty": np.random.randn()}
                 ),
             )
         return instances

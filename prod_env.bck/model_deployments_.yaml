@@ -1,0 +1,911 @@
+model_deployments:
+  ## AI Singapore
+  - name: vllm/sea-lion-7b
+    model_name: aisingapore/sea-lion-7b
+    tokenizer_name: aisingapore/sea-lion-7b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/sea-lion-7b-instruct
+    model_name: aisingapore/sea-lion-7b-instruct
+    tokenizer_name: aisingapore/sea-lion-7b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/llama3-8b-cpt-sea-lionv2-base
+    model_name: aisingapore/llama3-8b-cpt-sea-lionv2-base
+    tokenizer_name: meta/llama-3-8b-instruct
+    max_sequence_length: 8192
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/llama3-8b-cpt-sea-lionv2.1-instruct
+    model_name: aisingapore/llama3-8b-cpt-sea-lionv2.1-instruct
+    tokenizer_name: meta/llama-3-8b-instruct
+    max_sequence_length: 8192
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  ## Bigcode
+  - name: vllm/santacoder
+    model_name: bigcode/santacoder
+    tokenizer_name: bigcode/santacoder
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/starcoder
+    model_name: bigcode/starcoder
+    tokenizer_name: bigcode/starcoder
+    max_sequence_length: 8192
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  ## Biomistral 
+
+  - name: vllm/biomistral-7b
+    model_name: biomistral/biomistral-7b
+    tokenizer_name: mistralai/Mistral-7B-v0.1
+    max_sequence_length: 32000
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  ## Databricks
+  - name: vllm/dolly-v2-3b
+    model_name: databricks/dolly-v2-3b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/dolly-v2-7b
+    model_name: databricks/dolly-v2-7b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/dolly-v2-12b
+    model_name: databricks/dolly-v2-12b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  ## EleutherAI
+  - name: vllm/pythia-1b-v0
+    model_name: eleutherai/pythia-1b-v0
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/pythia-2.8b-v0
+    model_name: eleutherai/pythia-2.8b-v0
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/pythia-6.9b
+    model_name: eleutherai/pythia-6.9b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/pythia-12b-v0
+    model_name: eleutherai/pythia-12b-v0
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/gpt-j-6b
+    model_name: eleutherai/gpt-j-6b
+    tokenizer_name: EleutherAI/gpt-j-6B
+    max_sequence_length: 2048
+    max_request_length: 2049
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/gpt-neox-20b
+    model_name: eleutherai/gpt-neox-20b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    max_request_length: 2049
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  ## Google
+  - name: vllm/gemma-2b
+    model_name: google/gemma-2b
+    tokenizer_name: google/gemma-2b
+    max_sequence_length: 7167
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/gemma-2b-it
+    model_name: google/gemma-2b-it
+    tokenizer_name: google/gemma-2b
+    max_sequence_length: 7167
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/gemma-7b
+    model_name: google/gemma-7b
+    tokenizer_name: google/gemma-2b
+    max_sequence_length: 7167
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/gemma-7b-it
+    model_name: google/gemma-7b-it
+    tokenizer_name: google/gemma-2b
+    max_sequence_length: 7167
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/gemma-2-9b
+    model_name: google/gemma-2-9b
+    tokenizer_name: google/gemma-2-9b
+    max_sequence_length: 8192
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/gemma-2-9b-it
+    model_name: google/gemma-2-9b-it
+    tokenizer_name: google/gemma-2-9b
+    max_sequence_length: 8192
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/gemma-2-27b
+    model_name: google/gemma-2-27b
+    tokenizer_name: google/gemma-2-9b
+    max_sequence_length: 8192
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/gemma-2-27b-it
+    model_name: google/gemma-2-27b-it
+    tokenizer_name: google/gemma-2-9b
+    max_sequence_length: 8192
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  ## LMSYS
+  - name: vllm/vicuna-7b-v1.3
+    model_name: lmsys/vicuna-7b-v1.3
+    tokenizer_name: hf-internal-testing/llama-tokenizer
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/vicuna-13b-v1.3
+    model_name: lmsys/vicuna-13b-v1.3
+    tokenizer_name: hf-internal-testing/llama-tokenizer
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  ## Meditron 
+
+  - name: vllm/meditron-7b
+    model_name: epfl-llm/meditron-7b
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4094
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  ## Meta
+  - name: vllm/opt-175b
+    model_name: meta/opt-175b
+    tokenizer_name: facebook/opt-66b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: facebook/opt-175b
+
+  - name: vllm/opt-66b
+    model_name: meta/opt-66b
+    tokenizer_name: facebook/opt-66b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: facebook/opt-66b
+
+  - name: vllm/opt-6.7b
+    model_name: meta/opt-6.7b
+    tokenizer_name: facebook/opt-66b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: facebook/opt-6.7b
+
+  - name: vllm/opt-1.3b
+    model_name: meta/opt-1.3b
+    tokenizer_name: facebook/opt-66b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: facebook/opt-1.3b
+
+  ## NECTEC
+  - name: vllm/Pathumma-llm-text-1.0.0
+    model_name: nectec/Pathumma-llm-text-1.0.0
+    tokenizer_name: nectec/Pathumma-llm-text-1.0.0
+    max_sequence_length: 8192
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/OpenThaiLLM-Prebuilt-7B
+    model_name: nectec/OpenThaiLLM-Prebuilt-7B
+    tokenizer_name: nectec/OpenThaiLLM-Prebuilt-7B
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+
+  ## Microsoft
+  - name: vllm/phi-2
+    model_name: microsoft/phi-2
+    tokenizer_name: microsoft/phi-2
+    max_sequence_length: 2047
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/ 
+
+  - name: vllm/phi-3-small-8k-instruct
+    model_name: microsoft/phi-3-small-8k-instruct
+    tokenizer_name: microsoft/phi-3-small-8k-instruct
+    max_sequence_length: 8192
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        torch_dtype: auto
+        trust_remote_code: true
+
+  - name: vllm/phi-3-medium-4k-instruct
+    model_name: microsoft/phi-3-medium-4k-instruct
+    tokenizer_name: microsoft/phi-3-medium-4k-instruct
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        device_map: auto
+        torch_dtype: auto
+      
+  ## MosaicML
+  - name: vllm/mpt-7b
+    model_name: mosaicml/mpt-7b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: mosaicml/mpt-7b
+
+  - name: vllm/mpt-instruct-7b
+    model_name: mosaicml/mpt-instruct-7b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: mosaicml/mpt-7b-instruct
+
+  - name: vllm/mpt-30b
+    model_name: mosaicml/mpt-30b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/mpt-instruct-30b
+    model_name: mosaicml/mpt-instruct-30b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: mosaicml/mpt-30b-instruct
+
+  ## OpenAI
+  - name: vllm/gpt2
+    model_name: openai/gpt2
+    tokenizer_name: vllm/gpt2
+    max_sequence_length: 1024
+    max_request_length: 1025
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: openai-community/gpt2
+
+  ## SAIL (SEA AI Lab)
+  - name: vllm/sailor-7b
+    model_name: sail/sailor-7b
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/sailor-7b-chat
+    model_name: sail/sailor-7b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/sailor-14b
+    model_name: sail/sailor-14b
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        device_map: auto
+
+  - name: vllm/sailor-14b-chat
+    model_name: sail/sailor-14b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32768
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        device_map: auto
+
+  # Alibaba DAMO Academy
+  - name: vllm/seallm-7b-v2
+    model_name: damo/seallm-7b-v2
+    tokenizer_name: damo/seallm-7b-v2
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: SeaLLMs/SeaLLM-7B-v2
+
+  - name: vllm/seallm-7b-v2.5
+    model_name: damo/seallm-7b-v2.5
+    tokenizer_name: damo/seallm-7b-v2.5
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: SeaLLMs/SeaLLM-7B-v2.5
+
+  ## StabilityAI
+  - name: vllm/stablelm-base-alpha-3b
+    model_name: stabilityai/stablelm-base-alpha-3b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/stablelm-base-alpha-7b
+    model_name: stabilityai/stablelm-base-alpha-7b
+    tokenizer_name: EleutherAI/gpt-neox-20b
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  # Upstage
+  - name: vllm/solar-pro-preview-instruct
+    model_name: upstage/solar-pro-preview-instruct
+    tokenizer_name: upstage/solar-pro-preview-instruct
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        torch_dtype: auto
+        trust_remote_code: true
+
+  ## BigScience
+  - name: vllm/bloom
+    deprecated: true  # Removed from Together
+    model_name: bigscience/bloom
+    tokenizer_name: bigscience/bloom
+    max_sequence_length: 2048
+    max_request_length: 2049
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/t0pp
+    deprecated: true  # Removed from Together
+    model_name: bigscience/t0pp
+    tokenizer_name: bigscience/T0pp
+    max_sequence_length: 1024
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+    window_service_spec:
+      class_name: "helm.benchmark.window_services.encoder_decoder_window_service.EncoderDecoderWindowService"
+
+  ## Google
+  - name: vllm/t5-11b
+    deprecated: true  # Removed from Together
+    model_name: google/t5-11b
+    tokenizer_name: google/t5-11b
+    max_sequence_length: 511
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+    window_service_spec:
+      class_name: "helm.benchmark.window_services.encoder_decoder_window_service.EncoderDecoderWindowService"
+
+  - name: vllm/flan-t5-xxl
+    deprecated: true  # Removed from Together
+    model_name: google/flan-t5-xxl
+    tokenizer_name: google/flan-t5-xxl
+    max_sequence_length: 511
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+    window_service_spec:
+      class_name: "helm.benchmark.window_services.encoder_decoder_window_service.EncoderDecoderWindowService"
+
+  - name: vllm/ul2
+    deprecated: true  # Removed from Together
+    model_name: google/ul2
+    tokenizer_name: google/ul2
+    max_sequence_length: 511
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+    window_service_spec:
+      class_name: "helm.benchmark.window_services.encoder_decoder_window_service.EncoderDecoderWindowService"
+
+  ## Meta
+  - name: vllm/llama-2-7b
+    model_name: meta/llama-2-7b
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4094 # Subtract 2 tokens to work around a off-by-two bug in Together's token counting (#2080 and #2094)
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: meta-llama/Llama-2-7b
+
+  - name: vllm/llama-2-13b
+    model_name: meta/llama-2-13b
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4094 # Subtract 2 tokens to work around a off-by-two bug in Together's token counting (#2080 and #2094)
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: meta-llama/Llama-2-13b
+
+  - name: vllm/llama-2-70b
+    model_name: meta/llama-2-70b
+    tokenizer_name: meta-llama/Llama-2-7b-hf
+    max_sequence_length: 4094 # Subtract 2 tokens to work around a off-by-two bug in Together's token counting (#2080 and #2094)
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: meta-llama/Llama-2-70b
+
+  - name: vllm/llama-3-8b
+    model_name: meta/llama-3-8b
+    tokenizer_name: meta/llama-3-8b
+    max_sequence_length: 8191
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: meta-llama/Meta-Llama-3-8B
+
+  - name: vllm/llama-3-8b-instruct-turbo
+    model_name: meta/llama-3-8b-instruct-turbo
+    tokenizer_name: meta/llama-3-8b
+    max_sequence_length: 8191
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: meta-llama/Meta-Llama-3-8B-Instruct
+
+  - name: vllm/llama-3-70b
+    model_name: meta/llama-3-70b
+    tokenizer_name: meta/llama-3-8b
+    max_sequence_length: 8191
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: meta-llama/Meta-Llama-3-70B
+
+  - name: vllm/llama-3-70b-instruct-turbo
+    model_name: meta/llama-3-70b-instruct-turbo
+    tokenizer_name: meta/llama-3-8b
+    max_sequence_length: 8191
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: meta-llama/Meta-Llama-3-70B-Instruct
+
+  - name: vllm/llama-3.2-3b-instruct-turbo
+    model_name: meta/llama-3.2-3b-instruct-turbo
+    tokenizer_name: meta/llama-3.2-3b-instruct
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: meta-llama/Llama-3.2-3B-Instruct
+
+  - name: vllm/llama-3.3-70b-instruct-turbo
+    model_name: meta/llama-3.3-70b-instruct-turbo
+    tokenizer_name: meta/llama-3.3-70b-instruct
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+        pretrained_model_name_or_path: meta-llama/Llama-3.3-70B-Instruct
+
+
+  # Qwen
+
+  - name: vllm/qwen-7b
+    model_name: qwen/qwen-7b
+    tokenizer_name: qwen/qwen-7b
+    max_sequence_length: 32767
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        together_model: togethercomputer/Qwen-7B
+
+  - name: vllm/qwen1.5-7b
+    model_name: qwen/qwen1.5-7b
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32767
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        together_model: Qwen/Qwen1.5-7B
+
+  - name: vllm/qwen1.5-14b
+    model_name: qwen/qwen1.5-14b
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32767
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        together_model: Qwen/Qwen1.5-14B
+
+  - name: vllm/qwen1.5-32b
+    model_name: qwen/qwen1.5-32b
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32767
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        together_model: Qwen/Qwen1.5-32B
+
+  - name: vllm/qwen1.5-72b
+    model_name: qwen/qwen1.5-72b
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32767
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        together_model: Qwen/Qwen1.5-72B
+
+  - name: vllm/qwen1.5-7b-chat
+    model_name: qwen/qwen1.5-7b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32767
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/qwen1.5-14b-chat
+    model_name: qwen/qwen1.5-14b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32767
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/qwen1.5-32b-chat
+    model_name: qwen/qwen1.5-32b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32767
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/qwen1.5-72b-chat
+    model_name: qwen/qwen1.5-72b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32767
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/qwen1.5-110b-chat
+    model_name: qwen/qwen1.5-110b-chat
+    tokenizer_name: qwen/qwen1.5-7b
+    max_sequence_length: 32767
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/qwen2-72b-instruct
+    model_name: qwen/qwen2-72b-instruct
+    tokenizer_name: qwen/qwen2-72b-instruct
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/qwen2.5-7b-instruct-turbo
+    model_name: qwen/qwen2.5-7b-instruct-turbo
+    tokenizer_name: qwen/qwen2.5-7b-instruct
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/qwen2.5-72b-instruct-turbo
+    model_name: qwen/qwen2.5-72b-instruct-turbo
+    tokenizer_name: qwen/qwen2.5-7b-instruct
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+
+  - name: vllm/qwen-vl
+    model_name: qwen/qwen-vl
+    tokenizer_name: qwen/qwen-vl
+    max_sequence_length: 8191
+    client_spec:
+      class_name: "helm.clients.vision_language.qwen_vlm_client.QwenVLMClient"
+
+  - name: vllm/qwen-vl-chat
+    model_name: qwen/qwen-vl-chat
+    tokenizer_name: qwen/qwen-vl-chat
+    max_sequence_length: 8191
+    client_spec:
+      class_name: "helm.clients.vision_language.qwen_vlm_client.QwenVLMClient"
+
+  - name: vllm/qwen-audio-chat
+    model_name: qwen/qwen-audio-chat
+    tokenizer_name: qwen/qwen-audio-chat
+    max_sequence_length: 8191
+    client_spec:
+      class_name: "helm.clients.audio_language.qwen_audiolm_client.QwenAudioLMClient"
+
+  - name: vllm/qwen2-audio-instruct
+    model_name: qwen/qwen2-audio-instruct
+    tokenizer_name: qwen/qwen2-audio-instruct
+    max_sequence_length: 8191
+    client_spec:
+      class_name: "helm.clients.audio_language.qwen2_audiolm_client.Qwen2AudioLMClient"
+
+# Reka
+  - name: reka/reka-core
+    model_name: reka/reka-core
+    tokenizer_name: openai/cl100k_base
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.reka_client.RekaClient"
+  
+  - name: reka/reka-core-20240415
+    model_name: reka/reka-core-20240415
+    tokenizer_name: openai/cl100k_base
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.reka_client.RekaClient"
+  
+  - name: reka/reka-core-20240501
+    model_name: reka/reka-core-20240501
+    tokenizer_name: openai/cl100k_base
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.reka_client.RekaClient"
+
+  - name: reka/reka-flash
+    model_name: reka/reka-flash
+    tokenizer_name: openai/cl100k_base
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.reka_client.RekaClient"
+
+  - name: reka/reka-flash-20240226
+    model_name: reka/reka-flash-20240226
+    tokenizer_name: openai/cl100k_base
+    max_sequence_length: 128000
+    client_spec:
+      class_name: "helm.clients.reka_client.RekaClient"
+
+  - name: reka/reka-edge
+    model_name: reka/reka-edge
+    tokenizer_name: openai/cl100k_base
+    max_sequence_length: 64000
+    client_spec:
+      class_name: "helm.clients.reka_client.RekaClient"
+
+  - name: reka/reka-edge-20240208
+    model_name: reka/reka-edge-20240208
+    tokenizer_name: openai/cl100k_base
+    max_sequence_length: 64000
+    client_spec:
+      class_name: "helm.clients.reka_client.RekaClient"
+
+  # Upstage
+  - name: upstage/solar-pro-241126
+    model_name: upstage/solar-pro-241126
+    tokenizer_name: upstage/solar-pro-preview-instruct
+    max_sequence_length: 32768
+    client_spec:
+      class_name: "helm.clients.upstage_client.UpstageChatClient"
+
+# Diva Llama
+  - name: vllm/diva-llama
+    model_name: stanford/diva-llama
+    # TODO: Set the right tokenizer
+    tokenizer_name: meta/llama-3-8b-instruct
+    max_sequence_length: 8192
+    client_spec:
+      class_name: "helm.clients.audio_language.diva_llama_client.DivaLlamaClient"
+
+# LLaMA-Omni
+  - name: ictnlp/llama-3.1-8b-omni
+    model_name: ictnlp/llama-3.1-8b-omni
+    tokenizer_name: ictnlp/llama-3.1-8b-omni
+    max_sequence_length: 8192
+    client_spec:
+      class_name: "helm.clients.audio_language.llama_omni_client.LlamaOmniAudioLMClient"
+
+# IBM - Granite 3.0
+  - name: vllm/granite-3.0-2b-base
+    model_name: ibm-granite/granite-3.0-2b-base
+    tokenizer_name: ibm-granite/granite-3.0-2b-base
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        pretrained_model_name_or_path: ibm-granite/granite-3.0-2b-base 
+    
+  - name: vllm/granite-3.0-2b-instruct
+    model_name: ibm-granite/granite-3.0-2b-instruct
+    tokenizer_name: ibm-granite/granite-3.0-2b-instruct
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        pretrained_model_name_or_path: ibm-granite/granite-3.0-2b-instruct
+
+  - name: vllm/granite-3.0-8b-instruct
+    model_name: ibm-granite/granite-3.0-8b-instruct
+    tokenizer_name: ibm-granite/granite-3.0-8b-instruct
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        pretrained_model_name_or_path: ibm-granite/granite-3.0-8b-instruct
+  
+  - name: vllm/granite-3.0-8b-base
+    model_name: ibm-granite/granite-3.0-8b-base
+    tokenizer_name: ibm-granite/granite-3.0-8b-base
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        pretrained_model_name_or_path: ibm-granite/granite-3.0-8b-base
+
+  - name: vllm/granite-3.0-3b-a800m-instruct
+    model_name: ibm-granite/granite-3.0-3b-a800m-instruct
+    tokenizer_name: ibm-granite/granite-3.0-3b-a800m-instruct
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        pretrained_model_name_or_path: ibm-granite/granite-3.0-3b-a800m-instruct
+
+  - name: vllm/granite-3.0-3b-a800m-base
+    model_name: ibm-granite/granite-3.0-3b-a800m-base
+    tokenizer_name: ibm-granite/granite-3.0-3b-a800m-base
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        pretrained_model_name_or_path: ibm-granite/granite-3.0-3b-a800m-base
+
+  - name: vllm/granite-3.0-1b-a400m-instruct
+    model_name: ibm-granite/granite-3.0-1b-a400m-instruct
+    tokenizer_name: ibm-granite/granite-3.0-1b-a400m-instruct
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        pretrained_model_name_or_path: ibm-granite/granite-3.0-1b-a400m-instruct
+
+  - name: vllm/granite-3.0-1b-a400m-base
+    model_name: ibm-granite/granite-3.0-1b-a400m-base
+    tokenizer_name: ibm-granite/granite-3.0-1b-a400m-base
+    max_sequence_length: 4096
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+      args:
+        pretrained_model_name_or_path: ibm-granite/granite-3.0-1b-a400m-base
+
+  - name: vllm/sabia-7b
+    model_name: maritaca-ai/sabia-7b
+    tokenizer_name: maritaca-ai/sabia-7b
+    max_sequence_length: 2048
+    class_name: "helm.clients.vllm_client.VLLMClient"
+      args:
+        base_url:  http://mymodelserver:8000/v1/
+    args:
+      pretrained_model_name_or_path: maritaca-ai/sabia-7b

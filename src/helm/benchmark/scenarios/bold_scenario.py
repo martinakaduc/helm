@@ -115,6 +115,7 @@ class BOLDScenario(Scenario):
             if idx >= split_sizes["train"]:
                 curr_split = TEST_SPLIT
 
-            instances.append(Instance(Input(text=f"{prompt_text} "), split=curr_split, references=[]))
+            instances.append(Instance(Input(text=f"{prompt_text} "), split=curr_split, references=[], 
+                                extra_data={"difficulty": np.random.randn()}))
 
         return instances

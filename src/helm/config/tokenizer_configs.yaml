@@ -169,6 +169,12 @@ tokenizer_configs:
     end_of_text_token: "<｜end▁of▁sentence｜>"
     prefix_token: "<｜begin▁of▁sentence｜>"
 
+  - name: deepseek-ai/deepseek-coder-33b-instruct
+    tokenizer_spec:
+      class_name: "helm.tokenizers.huggingface_tokenizer.HuggingFaceTokenizer"
+    end_of_text_token: "<｜end▁of▁sentence｜>"
+    prefix_token: "<｜begin▁of▁sentence｜>"
+
   # EleutherAI
   - name: EleutherAI/gpt-j-6B
     tokenizer_spec:
@@ -356,6 +362,39 @@ tokenizer_configs:
         pretrained_model_name_or_path: meta-llama/Llama-3.3-70B-Instruct
     prefix_token: "<|begin_of_text|>"
     end_of_text_token: "<|eot_id|>"
+
+  # CodeLLama
+  - name: codellama/CodeLlama-7b-Instruct-hf
+    tokenizer_spec:
+      class_name: "helm.tokenizers.huggingface_tokenizer.HuggingFaceTokenizer"
+      args:
+        pretrained_model_name_or_path: codellama/CodeLlama-7b-Instruct-hf
+    prefix_token: "<s>"
+    end_of_text_token: "</s>"
+
+  - name: codellama/CodeLlama-34b-Instruct-hf
+    tokenizer_spec:
+      class_name: "helm.tokenizers.huggingface_tokenizer.HuggingFaceTokenizer"
+      args:
+        pretrained_model_name_or_path: codellama/CodeLlama-34b-Instruct-hf
+    prefix_token: "<s>"
+    end_of_text_token: "</s>"
+
+  - name: codellama/CodeLlama-13b-Instruct-hf
+    tokenizer_spec:
+      class_name: "helm.tokenizers.huggingface_tokenizer.HuggingFaceTokenizer"
+      args:
+        pretrained_model_name_or_path: codellama/CodeLlama-13b-Instruct-hf
+    prefix_token: "<s>"
+    end_of_text_token: "</s>"
+
+  - name: codellama/CodeLlama-70b-Instruct-hf
+    tokenizer_spec:
+      class_name: "helm.tokenizers.huggingface_tokenizer.HuggingFaceTokenizer"
+      args:
+        pretrained_model_name_or_path: codellama/CodeLlama-70b-Instruct-hf
+    prefix_token: "<s>"
+    end_of_text_token: "</s>"
 
   # 01-ai
   - name: 01-ai/Yi-6B
@@ -756,5 +795,14 @@ tokenizer_configs:
       class_name: "helm.tokenizers.huggingface_tokenizer.HuggingFaceTokenizer"
       args:
         pretrained_model_name_or_path: maritaca-ai/sabia-7b
+    end_of_text_token: "</s>"
+    prefix_token: "<s>"
+
+  # TogetherComputer
+  - name: togethercomputer/StripedHyena-Nous-7B
+    tokenizer_spec:
+      class_name: "helm.tokenizers.huggingface_tokenizer.HuggingFaceTokenizer"
+      args:
+        pretrained_model_name_or_path: togethercomputer/StripedHyena-Nous-7B
     end_of_text_token: "</s>"
     prefix_token: "<s>"

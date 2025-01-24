@@ -133,6 +133,7 @@ class BoolQScenario(Scenario):
                     split=split,
                     contrast_inputs=contrast_inputs,
                     contrast_references=contrast_references,
+                    extra_data={"difficulty": np.random.randn()}
                 )
                 split_instances.append(instance)
         return split_instances

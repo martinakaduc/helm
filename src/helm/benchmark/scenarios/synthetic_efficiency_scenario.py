@@ -83,6 +83,7 @@ class SyntheticEfficiencyScenario(Scenario):
                     input=Input(text=prompt),
                     references=[Reference(Output(text=""), tags=[CORRECT_TAG])],
                     split=TEST_SPLIT,
+                    extra_data={"difficulty": np.random.randn()}
                 )
                 instances.append(instance)
 

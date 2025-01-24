@@ -139,6 +139,7 @@ def downsample_eval_instances(
 @dataclasses.dataclass(order=True)
 class PrioritizedItem:
     priority: int
+    idx: int
     request_state: Any=dataclasses.field(compare=False)
 
 class Runner:
@@ -396,7 +397,7 @@ class Runner:
         elif priority == "default":
             priorities = np.linspace(0, 1, len(request_states))
             
-        else:
+        elif priority == "adaptive":
             priorities = [] 
             for request_state in request_states:
                 instance_difficulty = request_state.instance.extra_data["difficulty"]
@@ -406,14 +407,17 @@ class Runner:
                         instance_difficulty=instance_difficulty,
                     )
                 )
+        else:
+            raise ValueError(f"Unknown adaptive_mode: {priority}")
         
         # Add all requests to the queue with priority 0
         # Lower priority means being processed first
         request_state_queue = PriorityQueue()
-        for request_state, priority in zip(request_states, priorities):
+        for ridx, (request_state, priority) in enumerate(zip(request_states, priorities)):
             request_state_queue.put(
                 PrioritizedItem(
                     priority=priority,
+                    idx=ridx,
                     request_state=request_state,
                 )
             )
@@ -454,7 +458,7 @@ class Runner:
         request_state_queue = self._construct_request_state_queue(
             request_states=request_states,
             model_ability=model_ability,
-            priority="adaptive",
+            priority=run_spec.adaptive_mode,
         )
         adaptive_request_states: List[RequestState] = []
         stats: List[Stat] = []
@@ -466,6 +470,9 @@ class Runner:
         }
 
         for _ in tqdm(range(run_spec.adaptive_max_samples), desc="Adaptive execution"):
+            if request_state_queue.empty():
+                break
+            
             pitem = request_state_queue.get()
 
             # Execute the request
@@ -487,7 +494,7 @@ class Runner:
             # Update the adaptive trajectory
             adaptive_trajectory["model_ability"].append(model_ability)
             adaptive_trajectory["response_correctness"].append(
-                float(per_instance_stat[0].stats[0].mean > 0.5)
+                float(per_instance_stat[0].stats[0].mean >= 0.5)
             )
             adaptive_trajectory["instance_difficulties"].append(
                 pitem.request_state.instance.extra_data["difficulty"]
@@ -501,11 +508,15 @@ class Runner:
             )
             
             # Update the priority
-            request_state_queue = self._construct_request_state_queue(
-                request_states=request_states,
-                model_ability=model_ability,
-                priority="adaptive",
-            )
+            if run_spec.adaptive_mode != "default":
+                evaluated_idx = pitem.idx
+                del request_states[evaluated_idx]
+                
+                request_state_queue = self._construct_request_state_queue(
+                    request_states=request_states,
+                    model_ability=model_ability,
+                    priority=run_spec.adaptive_mode,
+                )
             
         # Create the scenario state
         scenario_state: ScenarioState = ScenarioState(

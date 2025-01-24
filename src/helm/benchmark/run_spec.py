@@ -39,7 +39,7 @@ class RunSpec:
     annotators: Optional[List[AnnotatorSpec]] = None
     """Annotators to use for this run spec"""
     
-    adaptive_mode: bool = False
+    adaptive_mode: str = ""
     """Whether to run in adaptive mode -- select the most informative samples to evaluate next"""
     
     adaptive_max_samples: int = 50

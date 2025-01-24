@@ -131,6 +131,7 @@ class NarrativeQAScenario(Scenario):
                     Reference(Output(text=answer2), tags=[CORRECT_TAG]),
                 ],
                 split=split,
+                extra_data={"difficulty": np.random.randn()}
             )
             split_instances.append(instance)
 

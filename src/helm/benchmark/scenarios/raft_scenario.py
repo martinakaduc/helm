@@ -140,6 +140,7 @@ class RAFTScenario(Scenario):
                     input=Input(text=prompt),
                     references=[Reference(Output(text=class_label_to_string(x["Label"])), tags=[CORRECT_TAG])],
                     split=split,
+                    extra_data={"difficulty": np.random.randn()}
                 )
                 instances.append(instance)
 

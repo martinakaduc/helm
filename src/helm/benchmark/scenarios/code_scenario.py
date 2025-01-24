@@ -116,6 +116,7 @@ def _read_and_preprocess_human_eval(
                 )
             ],
             split=split,
+            extra_data={"difficulty": np.random.randn()}
         )
         instances.append(instance)
     return instances

@@ -139,6 +139,7 @@ class LSATScenario(Scenario):
                                 input=PassageQuestionInput(passage=passage, question=question),
                                 references=references,
                                 split=splits[split],
+                                extra_data={"difficulty": np.random.randn()}
                             )
                             instances.append(instance)
 

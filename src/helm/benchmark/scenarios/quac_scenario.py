@@ -170,6 +170,7 @@ class QuACScenario(Scenario):
                 input=Input(text=prompt),
                 references=[Reference(Output(text=answer), tags=[CORRECT_TAG]) for answer in answers],
                 split=split,
+                extra_data={"difficulty": np.random.randn()}
             )
             split_instances.append(instance)
 

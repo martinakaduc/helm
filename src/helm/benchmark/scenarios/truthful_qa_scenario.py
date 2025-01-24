@@ -141,6 +141,7 @@ class TruthfulQAScenario(Scenario):
                         input=Input(text=question),
                         references=references,
                         split=split,
+                        extra_data={"difficulty": np.random.randn()}
                     )
                     instances.append(instance)
             return instances
