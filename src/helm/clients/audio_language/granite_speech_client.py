@@ -126,15 +126,30 @@ class GraniteSpeechClient(CachingClient):
                 try:
 
                     def do_it() -> Dict[str, Any]:
-                        inputs = tokenizer.apply_chat_template(input_query, add_generation_prompt=True, tokenize=False)
-                        audios: List[Any] = []
-                        for audio_url in list_audio_urls:
-                            audios.append(torchaudio.load(audio_url, normalize=True)[0])
-                        inputs = tokenizer(
-                            text=inputs,
-                            audio=audios,
-                            return_tensors="pt",
-                        ).to(self._device)
+                        if request.model_engine == "granite-speech-3.2-8b":
+                            inputs = tokenizer.tokenizer.apply_chat_template(
+                                input_query, add_generation_prompt=True, tokenize=False
+                            )
+                            audios: List[Any] = []
+                            for audio_url in list_audio_urls:
+                                audios.append(torchaudio.load(audio_url, normalize=True)[0])
+                            inputs = tokenizer(
+                                text=inputs,
+                                audios=audios,
+                                return_tensors="pt",
+                            ).to(self._device)
+                        else:
+                            inputs = tokenizer.apply_chat_template(
+                                input_query, add_generation_prompt=True, tokenize=False
+                            )
+                            audios: List[Any] = []
+                            for audio_url in list_audio_urls:
+                                audios.append(torchaudio.load(audio_url, normalize=True)[0])
+                            inputs = tokenizer(
+                                text=inputs,
+                                audio=audios,
+                                return_tensors="pt",
+                            ).to(self._device)
                         input_length = inputs["input_ids"].shape[1]
                         # Granite Speech counts input into the max_length,
                         # so we need to add the length of the prompt
