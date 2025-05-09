@@ -3,7 +3,7 @@ import os
 import json
 
 from tqdm import tqdm
-
+from huggingface_hub import snapshot_download
 from helm.benchmark.scenarios.scenario import (
     Scenario,
     Instance,
@@ -68,6 +68,19 @@ class UltraSuiteDisorderTagsScenario(Scenario):
     description = "A scenario for evaluating speech disorders in children"
     tags = ["audio", "classification", "speech_disorder"]
 
+    def __init__(self, dataset_name: str):
+        """
+        Initializes the question answering scenario.
+
+        Args:
+            dataset_name: The name of the dataset.
+        """
+        super().__init__()
+        if dataset_name == "ultrasuite":
+            self.dataset_repo = "SAA-Lab/UltraSuitePlus"
+        else:
+            raise ValueError(f"Unsupported dataset name: {dataset_name}")
+
     def get_instruction(self, words: str) -> str:
         prompt = f"""You are a highly experienced Speech-Language Pathologist (SLP). 
             An audio recording will be provided, typically consisting of a speech prompt 
@@ -131,7 +144,8 @@ class UltraSuiteDisorderTagsScenario(Scenario):
         split: str = TEST_SPLIT
 
         # Find all pairs of audio and JSON files
-        pairs = find_audio_json_pairs(output_path)
+        data_path = snapshot_download(repo_id=self.dataset_repo, repo_type="dataset")
+        pairs = find_audio_json_pairs(data_path)
 
         for audio_path, json_path in tqdm(pairs):
 

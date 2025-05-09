@@ -1,9 +1,18 @@
 from typing import List
 from helm.benchmark.adaptation.adapter_spec import AdapterSpec
-from helm.benchmark.metrics.common_metric_specs import audio_classification_metric_specs, get_basic_generation_metric_specs, get_exact_match_metric_specs
+from helm.benchmark.metrics.common_metric_specs import (
+    audio_classification_metric_specs,
+    get_basic_generation_metric_specs,
+    get_exact_match_metric_specs,
+)
 from helm.benchmark.metrics.metric import MetricSpec
 from helm.benchmark.run_spec import RunSpec, run_spec_function
-from helm.benchmark.run_specs.audio_run_specs import _get_audio_recognition_metric_specs, _get_generation_adapter_spec, _get_multiple_choice_joint_adapter_spec, _get_open_ended_generation_metric_specs
+from helm.benchmark.run_specs.audio_run_specs import (
+    _get_audio_recognition_metric_specs,
+    _get_generation_adapter_spec,
+    _get_multiple_choice_joint_adapter_spec,
+    _get_open_ended_generation_metric_specs,
+)
 from helm.benchmark.scenarios.scenario import ScenarioSpec
 
 
@@ -11,6 +20,9 @@ from helm.benchmark.scenarios.scenario import ScenarioSpec
 def get_ultra_suite_classification_run_spec() -> RunSpec:
     scenario_spec = ScenarioSpec(
         class_name="helm.benchmark.scenarios.audio_language.ultra_suite_classification_scenario.UltraSuiteClassificationScenario",
+        args={
+            "dataset_name": "ultrasuite",
+        },
     )
     adapter_spec: AdapterSpec = _get_multiple_choice_joint_adapter_spec(
         input_noun=None, output_noun="Answer", max_train_instances=0
@@ -25,10 +37,14 @@ def get_ultra_suite_classification_run_spec() -> RunSpec:
         groups=[run_spec_name],
     )
 
+
 @run_spec_function("ultra_suite_classification_breakdown")
 def get_ultra_suite_disorder_breakdown_run_spec() -> RunSpec:
     scenario_spec = ScenarioSpec(
         class_name="helm.benchmark.scenarios.audio_language.ultra_suite_disorder_breakdown_scenario.UltraSuiteDisorderBreakdownScenario",
+        args={
+            "dataset_name": "ultrasuite",
+        },
     )
     adapter_spec: AdapterSpec = _get_multiple_choice_joint_adapter_spec(
         input_noun=None, output_noun="Answer", max_train_instances=0
@@ -43,10 +59,14 @@ def get_ultra_suite_disorder_breakdown_run_spec() -> RunSpec:
         groups=[run_spec_name],
     )
 
+
 @run_spec_function("ultra_suite_asr_classification")
 def get_ultra_suite_asr_classification_run_spec() -> RunSpec:
     scenario_spec = ScenarioSpec(
         class_name="helm.benchmark.scenarios.audio_language.ultra_suite_asr_classification.UltraSuiteASRClassificationScenario",
+        args={
+            "dataset_name": "ultrasuite",
+        },
     )
     adapter_spec = _get_generation_adapter_spec(
         instructions="""You are a highly experienced Speech-Language Pathologist (SLP). 
@@ -58,7 +78,7 @@ def get_ultra_suite_asr_classification_run_spec() -> RunSpec:
             Only respond with the text transcription, no other text or commentary or punctuations.
             """,
         max_tokens=10,
-    )   
+    )
     metric_specs: List[MetricSpec] = audio_classification_metric_specs()
     run_spec_name: str = "ultra_suite_asr_classification"
     return RunSpec(
@@ -69,10 +89,14 @@ def get_ultra_suite_asr_classification_run_spec() -> RunSpec:
         groups=[run_spec_name],
     )
 
+
 @run_spec_function("ultra_suite_asr_transcription")
 def get_ultra_suite_asr_transcription_run_spec() -> RunSpec:
     scenario_spec = ScenarioSpec(
         class_name="helm.benchmark.scenarios.audio_language.ultra_suite_asr_classification.UltraSuiteASRClassificationScenario",
+        args={
+            "dataset_name": "ultrasuite",
+        },
     )
     adapter_spec = _get_generation_adapter_spec(
         instructions="""You are a highly experienced Speech-Language Pathologist (SLP). 
@@ -85,7 +109,7 @@ def get_ultra_suite_asr_transcription_run_spec() -> RunSpec:
             Only respond with the text transcription, no other text, commentary or punctuations.
             """,
         max_tokens=50,
-    )   
+    )
     metric_specs: List[MetricSpec] = get_basic_generation_metric_specs(["wer_score", "mer_score", "wip_score"])
     run_spec_name: str = "ultra_suite_asr_transcription"
     return RunSpec(
@@ -96,10 +120,14 @@ def get_ultra_suite_asr_transcription_run_spec() -> RunSpec:
         groups=[run_spec_name],
     )
 
+
 @run_spec_function("ultra_suite_disorder_symptoms")
 def get_ultra_suite_disorder_symptoms_run_spec() -> RunSpec:
     scenario_spec = ScenarioSpec(
         class_name="helm.benchmark.scenarios.audio_language.ultra_suite_disorder_tags_scenario.UltraSuiteDisorderTagsScenario",
+        args={
+            "dataset_name": "ultrasuite",
+        },
     )
     adapter_spec: AdapterSpec = _get_multiple_choice_joint_adapter_spec(
         input_noun=None, output_noun="Answer", max_train_instances=0

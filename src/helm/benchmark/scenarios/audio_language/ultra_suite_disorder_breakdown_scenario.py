@@ -3,7 +3,7 @@ import os
 import json
 
 from tqdm import tqdm
-
+from huggingface_hub import snapshot_download
 from helm.benchmark.scenarios.scenario import (
     Scenario,
     Instance,
@@ -24,10 +24,23 @@ class UltraSuiteDisorderBreakdownScenario(Scenario):
     This scenario extends the basic speech disorder classification by breaking down disorders
     into specific categories: articulation and phonological disorders.
     """
-    
+
     name = "speech_disorder_breakdown"
     description = "A scenario for evaluating and classifying specific types of speech disorders in children"
     tags = ["audio", "classification", "speech_disorder", "disorder_breakdown"]
+
+    def __init__(self, dataset_name: str):
+        """
+        Initializes the question answering scenario.
+
+        Args:
+            dataset_name: The name of the dataset.
+        """
+        super().__init__()
+        if dataset_name == "ultrasuite":
+            self.dataset_repo = "SAA-Lab/UltraSuitePlus"
+        else:
+            raise ValueError(f"Unsupported dataset name: {dataset_name}")
 
     def get_instruction(self, words: str) -> str:
         return f"""You are a highly experienced Speech-Language Pathologist (SLP). 
@@ -72,9 +85,10 @@ class UltraSuiteDisorderBreakdownScenario(Scenario):
         instances: List[Instance] = []
         split: str = TEST_SPLIT
         print(f"Output path: {os.path.abspath(output_path)}")
-        
+
         # Find all pairs of audio and JSON files
-        pairs = find_audio_json_pairs(output_path)
+        data_path = snapshot_download(repo_id=self.dataset_repo, repo_type="dataset")
+        pairs = find_audio_json_pairs(data_path)
         print(f"Num pairs: {len(pairs)}")
 
         for audio_path, json_path in tqdm(pairs):
@@ -101,4 +115,4 @@ class UltraSuiteDisorderBreakdownScenario(Scenario):
             input = Input(multimedia_content=MultimediaObject(content))
             instances.append(Instance(input=input, references=references, split=split))
 
-        return instances 
+        return instances

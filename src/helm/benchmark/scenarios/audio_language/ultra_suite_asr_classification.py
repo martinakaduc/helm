@@ -3,7 +3,7 @@ import os
 import json
 
 from tqdm import tqdm
-
+from huggingface_hub import snapshot_download
 from helm.benchmark.scenarios.scenario import (
     Scenario,
     Instance,
@@ -21,10 +21,10 @@ def find_audio_json_pairs(directory: str) -> List[Tuple[str, str]]:
     """
     Find all pairs of MP3 and JSON files in the given directory and its subdirectories.
     Each pair consists of an MP3 file and its corresponding JSON file with the same base name.
-    
+
     Args:
         directory: Path to the directory containing the files
-        
+
     Returns:
         List of tuples where each tuple contains (mp3_path, json_path)
     """
@@ -33,7 +33,7 @@ def find_audio_json_pairs(directory: str) -> List[Tuple[str, str]]:
     # Walk through all directories and subdirectories
     for root, _, files in os.walk(directory):
         # Get all MP3 files in current directory
-        mp3_files = [f for f in files if f.endswith('.mp3')]
+        mp3_files = [f for f in files if f.endswith(".mp3")]
 
         for mp3_file in mp3_files:
             base_name = os.path.splitext(mp3_file)[0]
@@ -71,6 +71,25 @@ class UltraSuiteASRClassificationScenario(Scenario):
     # Classification options
     options: List[str] = ["Healthy", "Unhealthy"]
 
+    def __init__(self, dataset_name: str):
+        """
+        Initializes the question answering scenario.
+
+        Args:
+            dataset_name: The name of the dataset.
+        """
+        super().__init__()
+        if dataset_name == "ultrasuite":
+            self.dataset_repo = "SAA-Lab/UltraSuite"
+        elif dataset_name == "enni":
+            self.dataset_repo = "SAA-Lab/ENNI"
+        elif dataset_name == "lenormand":
+            self.dataset_repo = "SAA-Lab/LeNormand"
+        elif datset_name == "percept-gfta":
+            self.dataset_repo = "SAA-Lab/PERCEPT-GFTA"
+        else:
+            raise ValueError(f"Unsupported dataset name: {dataset_name}")
+
     def get_instances(self, output_path: str) -> List[Instance]:
         """
         Create instances from the audio files and their corresponding JSON annotations.
@@ -85,16 +104,17 @@ class UltraSuiteASRClassificationScenario(Scenario):
         split: str = TEST_SPLIT
 
         # Find all pairs of audio and JSON files
-        pairs = find_audio_json_pairs(output_path)
+        data_path = snapshot_download(repo_id=self.dataset_repo, repo_type="dataset")
+        pairs = find_audio_json_pairs(data_path)
 
         for audio_path, json_path in tqdm(pairs):
 
             # Load the annotation
-            with open(json_path, 'r') as f:
+            with open(json_path, "r") as f:
                 annotation = json.load(f)
 
             # Get the correct answer and convert to label
-            answer = " ".join(annotation['words'])
+            answer = " ".join(annotation["words"])
             # Create references for each option
             references: List[Reference] = []
             reference = Reference(Output(text=answer), tags=[CORRECT_TAG])
