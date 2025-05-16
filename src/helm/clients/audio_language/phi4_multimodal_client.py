@@ -4,7 +4,8 @@ from typing import Any, Dict, List, Optional
 
 import torch
 from dataclasses import dataclass
-from transformers import AutoModelForCausalLM, AutoProcessor, GenerationConfig
+from helm.clients.audio_language.phi4mm.modeling_phi4mm import Phi4MMForCausalLM
+from transformers import GenerationConfig, AutoProcessor
 
 from helm.common.cache import CacheConfig
 from helm.common.gpu_utils import get_torch_device_name
@@ -19,7 +20,7 @@ from helm.clients.client import CachingClient, generate_uid_for_multimodal_promp
 class LoadedPhiModelProcessor:
     """Loaded model and processor for Phi."""
 
-    model: AutoModelForCausalLM
+    model: Phi4MMForCausalLM
     tokenizer: AutoProcessor
     generation_config: GenerationConfig
 
@@ -59,7 +60,7 @@ class Phi4MultimodalClient(CachingClient):
             loaded_model_processor = _models[model_name]
             if loaded_model_processor is None:
                 hlog(f"Loading model {model_name} and caching in memory...")
-                model = AutoModelForCausalLM.from_pretrained(
+                model = Phi4MMForCausalLM.from_pretrained(
                     model_name,
                     device_map=self._device,
                     trust_remote_code=True,
@@ -92,13 +93,15 @@ class Phi4MultimodalClient(CachingClient):
         list_texts: List[str] = []
 
         input_query.append({"role": "system", "content": "You are a helpful assistant."})
-        prompt_text += "<|system|>You are a helpful assistant.<|end|>\n<|user|>"
-        for media_num, media_object in enumerate(request.multimodal_prompt.media_objects):
+        prompt_text = "<|system|>You are a helpful assistant.<|end|>\n<|user|>"
+        media_num = 1
+        for media_object in request.multimodal_prompt.media_objects:
             if media_object.is_type("audio") and media_object.location:
                 assert media_object.is_local_file, "Only local audio files are supported"
                 list_audio_urls.append(media_object.location)
-                list_texts.append(f"<|audio_{media_num+1}|>")
-                prompt_text += f"<|audio_{media_num+1}|>"
+                list_texts.append(f"<|audio_{media_num}|>")
+                prompt_text += f"<|audio_{media_num}|>"
+                media_num += 1
             elif media_object.is_type(TEXT_TYPE):
                 if media_object.text is None:
                     raise ValueError("MediaObject of text type has missing text field value")
@@ -133,7 +136,7 @@ class Phi4MultimodalClient(CachingClient):
                         # so we need to add the length of the prompt
                         pred = model.generate(
                             **inputs,
-                            max_new_tokens=request.max_tokens + input_length,
+                            max_new_tokens=request.max_tokens,
                             generation_config=generation_config,
                             num_logits_to_keep=1,
                         )[:, input_length:]

@@ -79,14 +79,11 @@ class UltraSuiteASRClassificationScenario(Scenario):
             dataset_name: The name of the dataset.
         """
         super().__init__()
-        if dataset_name == "ultrasuite":
-            self.dataset_repo = "SAA-Lab/UltraSuite"
-        elif dataset_name == "enni":
-            self.dataset_repo = "SAA-Lab/ENNI"
-        elif dataset_name == "lenormand":
-            self.dataset_repo = "SAA-Lab/LeNormand"
-        elif datset_name == "percept-gfta":
-            self.dataset_repo = "SAA-Lab/PERCEPT-GFTA"
+        self.dataset_name = dataset_name
+        if dataset_name in ["enni", "lenormand", "percept-gfta"]:
+            self.dataset_repo = "SAA-Lab/SLPHelmDatasetA"
+        elif dataset_name == "ultrasuite":
+            self.dataset_repo = "SAA-Lab/SLPHelmUltraSuite"
         else:
             raise ValueError(f"Unsupported dataset name: {dataset_name}")
 
@@ -105,6 +102,12 @@ class UltraSuiteASRClassificationScenario(Scenario):
 
         # Find all pairs of audio and JSON files
         data_path = snapshot_download(repo_id=self.dataset_repo, repo_type="dataset")
+        if self.dataset_name == "enni":
+            data_path = os.path.join(data_path, "ENNI")
+        elif self.dataset_name == "lenormand":
+            data_path = os.path.join(data_path, "LeNormand")
+        elif self.dataset_name == "percept-gfta":
+            data_path = os.path.join(data_path, "PERCEPT-GFTA")
         pairs = find_audio_json_pairs(data_path)
 
         for audio_path, json_path in tqdm(pairs):
@@ -114,7 +117,7 @@ class UltraSuiteASRClassificationScenario(Scenario):
                 annotation = json.load(f)
 
             # Get the correct answer and convert to label
-            answer = " ".join(annotation["words"])
+            answer = annotation["transcription"]
             # Create references for each option
             references: List[Reference] = []
             reference = Reference(Output(text=answer), tags=[CORRECT_TAG])

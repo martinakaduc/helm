@@ -68,12 +68,6 @@ def get_multiple_choice_classification_metric_specs() -> List[MetricSpec]:
     ]
 
 
-def audio_classification_metric_specs() -> List[MetricSpec]:
-    return get_multiple_choice_classification_metric_specs() + get_basic_metric_specs(
-        ["exact_match", "quasi_exact_match"]
-    )
-
-
 def get_toxicity_metric_specs() -> List[MetricSpec]:
     return [
         MetricSpec(class_name="helm.benchmark.metrics.toxicity_metrics.ToxicityMetric", args={}),

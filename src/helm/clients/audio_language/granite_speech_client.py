@@ -94,10 +94,9 @@ class GraniteSpeechClient(CachingClient):
         generation_config = loaded_model_processor.generation_config
 
         input_query: List[Dict[str, Any]] = []
-        prompt_text: str = ""
 
         input_query.append({"role": "system", "content": "You are a helpful AI assistant."})
-        prompt_text += "<|start_of_role|>system<|end_of_role|>You are a helpful AI assistant.<|end_of_text|>\n<|start_of_role|>user<|end_of_role|>"
+        prompt_text = "<|start_of_role|>system<|end_of_role|>You are a helpful AI assistant.<|end_of_text|>\n<|start_of_role|>user<|end_of_role|>"
         list_audio_urls: List[str] = []
         list_texts: List[str] = []
         for media_num, media_object in enumerate(request.multimodal_prompt.media_objects):
@@ -155,7 +154,7 @@ class GraniteSpeechClient(CachingClient):
                         # so we need to add the length of the prompt
                         pred = model.generate(
                             **inputs,
-                            max_new_tokens=request.max_tokens + input_length,
+                            max_new_tokens=request.max_tokens,
                             generation_config=generation_config,
                         )[:, input_length:]
 

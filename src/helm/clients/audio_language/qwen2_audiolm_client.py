@@ -25,6 +25,8 @@ class LoadedQwenModelProcessor:
 _models_lock: Lock = Lock()
 _models: Dict[str, Optional[LoadedQwenModelProcessor]] = {
     "Qwen/Qwen2-Audio-7B-Instruct": None,
+    "SAA-Lab/Qwen2-Audio-7B-Instruct-Ultrasuite": None,
+    "SAA-Lab/Qwen2-Audio-7B-Instruct-Ultrasuite-woA": None,
 }
 
 
@@ -53,6 +55,10 @@ class Qwen2AudioLMClient(CachingClient):
         model_name: str
         if helm_model_name == "qwen2-audio-7b-instruct":
             model_name = "Qwen/Qwen2-Audio-7B-Instruct"
+        elif helm_model_name == "Qwen2-Audio-7B-Instruct-Ultrasuite":
+            model_name = "SAA-Lab/Qwen2-Audio-7B-Instruct-Ultrasuite"
+        elif helm_model_name == "Qwen2-Audio-7B-Instruct-Ultrasuite-woA":
+            model_name = "SAA-Lab/Qwen2-Audio-7B-Instruct-Ultrasuite-woA"
         else:
             raise ValueError(f"Unhandled model name: {helm_model_name}")
 
@@ -63,7 +69,8 @@ class Qwen2AudioLMClient(CachingClient):
                 hlog(f"Loading model {model_name} and caching in memory...")
                 model = Qwen2AudioForConditionalGeneration.from_pretrained(
                     model_name,
-                    device_map=self._device,
+                    # device_map=self._device,
+                    device_map="auto",
                 ).eval()
                 tokenizer = AutoProcessor.from_pretrained(
                     model_name,
