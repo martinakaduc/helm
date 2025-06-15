@@ -32,6 +32,16 @@ _models: Dict[str, Optional[LoadedQwen2_5OmniModelProcessor]] = {
     "SAA-Lab/Qwen2.5-Omni-3B-UltraSuite": None,
     "SAA-Lab/Qwen2.5-Omni-7B-UltraSuite-woA": None,
     "SAA-Lab/Qwen2.5-Omni-3B-UltraSuite-woA": None,
+    "finetuning_results/iter_1": None,
+    "finetuning_results/iter_2": None,
+    "finetuning_results/iter_3": None,
+    "finetuning_results/iter_4": None,
+    "finetuning_results/iter_5": None,
+    "finetuning_results/iter_6": None,
+    "finetuning_results/iter_7": None,
+    "finetuning_results/iter_8": None,
+    "finetuning_results/iter_9": None,
+    "finetuning_results/iter_10": None,
 }
 
 
@@ -67,6 +77,8 @@ class Qwen2_5OmniAudioLMClient(CachingClient):
             model_name = "SAA-Lab/Qwen2.5-Omni-7B-UltraSuite-woA"
         elif helm_model_name == "Qwen2.5-Omni-3B-UltraSuite-woA":
             model_name = "SAA-Lab/Qwen2.5-Omni-3B-UltraSuite-woA"
+        elif helm_model_name.startswith("iter_"):
+            model_name = f"finetuning_results/{helm_model_name}"
         else:
             raise ValueError(f"Unhandled model name: {helm_model_name}")
 

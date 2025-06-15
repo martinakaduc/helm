@@ -106,9 +106,14 @@ class UltraSuiteDisorderTagsScenario(Scenario):
             prompt = annotation["transcription"]
             # Create references for each option
             references: List[Reference] = []
+            correct_label = 0
             for option in ["substitution", "omission", "addition", "typically_developing", "stuttering"]:
                 reference = Reference(Output(text=option), tags=[CORRECT_TAG] if option == label else [])
                 references.append(reference)
+                if option == label:
+                    correct_label += 1
+            if correct_label == 0:
+                continue
 
             # Create the input with audio and instruction
             content = [
