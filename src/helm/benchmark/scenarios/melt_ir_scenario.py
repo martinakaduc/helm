@@ -1,6 +1,9 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
+from collections import defaultdict
 
+import csv
 from datasets import load_dataset, Dataset
+from huggingface_hub import hf_hub_download
 from helm.common.hierarchical_logger import hlog
 from helm.benchmark.scenarios.scenario import (
     Scenario,
@@ -12,6 +15,7 @@ from helm.benchmark.scenarios.scenario import (
     Input,
     Output,
     make_rank_tag,
+    make_relevance_tag,
 )
 
 
@@ -56,6 +60,29 @@ class MELTInformationRetrievalScenario(Scenario):
         if self.valid_topk is not None:
             assert valid_topk and self.MIN_TOPK <= valid_topk <= self.MAX_VALID_TOPK
 
+    @staticmethod
+    def create_qrels_dict(file_path: str, delimiter: str = "\t") -> Dict[int, Dict[int, int]]:
+        """Read the provided file as a qrels dictionary.
+
+        Given a file with rows in the following format:
+            <qid>   0   <docid>   <rel>
+
+        Return a dictionary of the form:
+            {
+                <qid>: {
+                    <docid>: <rel>,
+                    ...
+                },
+                ...
+            }
+        """
+        qrels_dict: Dict[int, Dict[int, int]] = defaultdict(dict)
+        with open(file_path, encoding="utf-8") as f:
+            for qid, _, docid, rel in csv.reader(f, delimiter=delimiter):
+                qrels_dict[int(qid)][str(docid)] = int(rel)
+        qrels_dict = {k: v for k, v in qrels_dict.items()}  # Convert to regular dict
+        return qrels_dict
+
     def get_train_instances(self) -> List[Instance]:
         """Get training instances.
         References for each instance are selected as follows:
@@ -65,9 +92,9 @@ class MELTInformationRetrievalScenario(Scenario):
             corresponds to a non-gold document for the given train query.
         """
         dataset = load_dataset(
-            self.dataset_name,
-            self.subset,
-            revision=self.revision,
+            "unicamp-dl/mmarco",
+            "vietnamese",
+            revision="6d039c4638c0ba3e46a9cb7b498b145e7edc6230",
             trust_remote_code=True,
         )
         instances = []
@@ -99,17 +126,44 @@ class MELTInformationRetrievalScenario(Scenario):
             revision=self.revision,
             trust_remote_code=True,
         )
+
+        if self.dataset_name == "unicamp-dl/mmarco":
+            qrel_file = "data/qrels.dev.tsv"
+            delimiter = "\t"
+            gold_relations = [1]
+        elif self.dataset_name == "ura-hcmut/mrobust":
+            qrel_file = "qrels.robust2004.txt"
+            delimiter = " "
+            gold_relations = [2]
+
+        qrel_file = hf_hub_download(
+            repo_id=self.dataset_name,
+            filename=qrel_file,
+            repo_type="dataset",
+        )
+        qrels_dict = self.create_qrels_dict(file_path=qrel_file, delimiter=delimiter)
+
         instances = []
         for sample in dataset["bm25"]:
             references = []
 
+            qid = int(sample["id"])
+            if qid not in qrels_dict:
+                continue
+
             for k, passage_dict in enumerate(Dataset.from_dict(sample["passages"])):
                 if self.valid_topk is None or k >= self.valid_topk:
                     break
+
+                docid = str(passage_dict["id"])
+                rel = qrels_dict[qid][docid] if docid in qrels_dict[qid] else 0
+                gold = rel in gold_relations
+
                 tags = []
                 tags.append(f"docid={passage_dict['id']}")
-                if k == 0:
+                if k == 0 or gold:
                     tags.append(CORRECT_TAG)
+                tags.append(make_relevance_tag(relevance=rel))
                 tags.append(make_rank_tag(rank=k + 1))  # Top-k rank
                 references.append(Reference(Output(text=passage_dict["passage"]), tags=tags))
 
@@ -164,8 +218,8 @@ class MELTInformationRetrievalMRobustScenario(MELTInformationRetrievalScenario):
 
     def __init__(self, **kwargs):
         super().__init__(
-            dataset_name="unicamp-dl/mrobust",
-            revision="fda452a7fbfd9550db2f78d9d98e6b3ec16734df",
+            dataset_name="ura-hcmut/mrobust",
+            revision="05d6787312955d2d961b71d1957d25ebaf6aef69",
             subset="vietnamese",
             **kwargs,
         )
