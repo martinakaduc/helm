@@ -188,6 +188,10 @@ metrics:
     display_name: RR@5
     description: Mean reciprocal rank at 5 in information retrieval.
     lower_is_better: false
+  - name: NDCG@5
+    display_name: NDCG@5
+    description: Mean reciprocal rank at 5 in information retrieval.
+    lower_is_better: false
   - name: NDCG@10
     display_name: NDCG@10
     description: Normalized discounted cumulative gain at 10 in information retrieval.
@@ -311,6 +315,18 @@ metrics:
   - name: RR@20 (topk=30)
     display_name: RR@20 (topk=30)
     description: Mean reciprocal rank at 20 in information retrieval.
+    lower_is_better: false
+  - name: NDCG@5 (topk=30)
+    display_name: NDCG@5 (topk=30)
+    description: Normalized discounted cumulative gain at 5 in information retrieval.
+    lower_is_better: false
+  - name: NDCG@10 (topk=30)
+    display_name: NDCG@10 (topk=30)
+    description: Normalized discounted cumulative gain at 10 in information retrieval.
+    lower_is_better: false
+  - name: NDCG@20 (topk=30)
+    display_name: NDCG@20 (topk=30)
+    description: Normalized discounted cumulative gain at 20 in information retrieval.
     lower_is_better: false
   - name: math_equiv
     display_name: Equivalent
@@ -458,16 +474,6 @@ metrics:
     short_display_name: Observed inference time (s)
     lower_is_better: true
     description: Average observed time to process a request to the model (via an API, and thus depends on particular deployment).
-  - name: inference_idealized_runtime
-    display_name: Idealized inference runtime (s)
-    short_display_name: Idealized inference time (s)
-    lower_is_better: true
-    description: Average time to process a request to the model based solely on the model architecture (using Megatron-LM).
-  - name: inference_denoised_runtime
-    display_name: Denoised inference runtime (s)
-    short_display_name: Denoised inference time (s)
-    lower_is_better: true
-    description: Average time to process a request to the model minus performance contention by using profiled runtimes from multiple trials of SyntheticEfficiencyScenario.
   - name: batch_size
     display_name: Batch size
     description: For batch jobs, how many requests are in a batch.
@@ -652,7 +658,7 @@ metric_groups:
   - name: efficiency
     display_name: Efficiency
     metrics:
-    - name: inference_denoised_runtime
+    - name: inference_runtime
       split: ${main_split}
 
   - name: efficiency_detailed
@@ -660,10 +666,6 @@ metric_groups:
     description: The efficiency of the model across both training and inference.
     metrics:
       - name: inference_runtime
-        split: ${main_split}
-      - name: inference_idealized_runtime
-        split: ${main_split}
-      - name: inference_denoised_runtime
         split: ${main_split}
       - name: training_co2_cost
         split: ${main_split}
@@ -721,40 +723,38 @@ metric_groups:
 run_groups:
   - name: melt
     display_name: MELT Scenarios
-    description: Scenarios for the medical domain
+    description: Scenarios for the evaluating Vietnamese-capable LLMs.
     category: All scenarios
+    subgroups:
+      - melt_question_answering
+      - melt_summarization
+      - melt_synthetic_reasoning
+      - melt_math
+      - melt_text_classification
+      - melt_sentiment_analysis
+      - melt_translation
+      - melt_lm_modeling
+      - melt_knowledge
+      - melt_toxicity_detection
+      - melt_information_retrieval
+
+  - name: melt_question_answering
+    display_name: Question answering
+    description: Scenarios for question answering tasks.
+    category: Question Answering
     subgroups:
       - melt_question_answering_mlqa
       - melt_question_answering_xquad
-      - melt_summarization_vietnews
-      - melt_summarization_wikilingua
-      - melt_synthetic_reasoning
-      - melt_math
-      - melt_text_classification_vsmec
-      - melt_text_classification_phoatis
-      - melt_sentiment_analysis_vlsp
-      - melt_sentiment_analysis_vsfc
-      - melt_translation_opus100
-      - melt_translation_phomt
-      - melt_lm_mask_filling_mlqa
-      - melt_lm_spelling_correction_vsec
-      - melt_knowledge_zalo
-      - melt_knowledge_vimmrc
-      - melt_toxicity_detection_vihsd
-      - melt_toxicity_detection_victsd
-      - melt_information_retrieval_mmarco
-      - melt_information_retrieval_mrobust
 
   - name: melt_question_answering_mlqa
     display_name: MLQA
     description: Scenarios for question answering with the MLQA dataset.
-    category: Question Answering
     metric_groups:
       - accuracy
       - efficiency
       - general_information
     environment:
-      main_name: quasi_exact_match
+      main_name: f1_score
       main_split: test
     taxonomy:
       task: question answering
@@ -766,13 +766,12 @@ run_groups:
   - name: melt_question_answering_xquad
     display_name: XQuAD
     description: Scenarios for question answering with the XQuAD dataset.
-    category: Question Answering
     metric_groups:
       - accuracy
       - efficiency
       - general_information
     environment:
-      main_name: quasi_exact_match
+      main_name: f1_score
       main_split: test
     taxonomy:
       task: question answering
@@ -780,11 +779,18 @@ run_groups:
       who: "?"
       when: "?"
       language: Vietnamese
+
+  - name: melt_summarization
+    display_name: Summarization
+    description: Scenarios for summarization tasks.
+    category: Summarization
+    subgroups:
+      - melt_summarization_vietnews
+      - melt_summarization_wikilingua
     
   - name: melt_summarization_vietnews
     display_name: VietNews
     description: Scenarios for summarization with the VietNews dataset.
-    category: Summarization
     metric_groups:
       - accuracy
       - summarization_metrics
@@ -805,7 +811,6 @@ run_groups:
   - name: melt_summarization_wikilingua
     display_name: WikiLingua
     description: Scenarios for summarization with the WikiLingua dataset.
-    category: Summarization
     metric_groups:
       - accuracy
       - summarization_metrics
@@ -824,25 +829,14 @@ run_groups:
       language: Vietnamese
 
   - name: melt_synthetic_reasoning
-    display_name: Synthetic reasoning (abstract symbols)
+    display_name: Synthetic reasoning
     description: Synthetic reasoning tasks defined using abstract symbols based on LIME [(Wu et al., 2021)](https://proceedings.mlr.press/v139/wu21c.html).
-    metric_groups:
-      - accuracy
-      - efficiency
-      - general_information
-    environment:
-      main_name: quasi_exact_match
-      main_split: test
-    taxonomy:
-      task: "reasoning"
-      what: n/a
-      who: n/a
-      when: n/a
-      language: synthetic
+    category: Reasoning
     subgroups:
       - melt_synthetic_reasoning_pattern_match
       - melt_synthetic_reasoning_variable_substitution
       - melt_synthetic_reasoning_induction
+      - melt_synthetic_reasoning_natural
 
   - name: melt_synthetic_reasoning_pattern_match
     display_name: Synthetic reasoning (pattern match)
@@ -915,10 +909,7 @@ run_groups:
   - name: melt_math
     display_name: MATH
     description: The MATH benchmark for measuring mathematical problem solving on competition math problems [(Hendrycks et al., 2021)](https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/hash/be83ab3ecd0db773eb2dc1b0a17836a1-Abstract-round2.html).
-    metric_groups:
-      - accuracy
-      - efficiency
-      - general_information
+    category: Reasoning
     subgroups:
       - melt_math_regular
       - melt_math_chain_of_thought
@@ -956,6 +947,14 @@ run_groups:
       who: n/a
       when: n/a
       language: synthetic
+
+  - name: melt_text_classification
+    display_name: Text classification
+    description: Scenarios for text classification tasks.
+    category: Text Classification
+    subgroups:
+      - melt_text_classification_phoatis
+      - melt_text_classification_vsmec
 
   - name: melt_text_classification_phoatis
     display_name: PhoATIS
@@ -1003,6 +1002,14 @@ run_groups:
       when: "?"
       language: Vietnamese
 
+  - name: melt_sentiment_analysis
+    display_name: Sentiment analysis
+    description: Scenarios for sentiment analysis tasks.
+    category: Sentiment Analysis
+    subgroups:
+      - melt_sentiment_analysis_vlsp
+      - melt_sentiment_analysis_vsfc
+
   - name: melt_sentiment_analysis_vlsp
     display_name: VLSP
     short_display_name: VLSP
@@ -1049,6 +1056,14 @@ run_groups:
       when: "?"
       language: Vietnamese
 
+  - name: melt_translation
+    display_name: Translation
+    description: Scenarios for translation tasks.
+    category: Translation
+    subgroups:
+      - melt_translation_opus100
+      - melt_translation_phomt
+
   - name: melt_translation_opus100
     display_name: OPUS100
     short_display_name: OPUS100
@@ -1058,7 +1073,7 @@ run_groups:
       - efficiency
       - general_information
     environment:
-      main_name: quasi_exact_match
+      main_name: bleu_1
       main_split: test
     taxonomy:
       task: translation
@@ -1076,14 +1091,22 @@ run_groups:
       - efficiency
       - general_information
     environment:
-      main_name: quasi_exact_match
+      main_name: bleu_1
       main_split: test
     taxonomy:
       task: translation
       what: "?"
       who: "?"
       when: "?"
-      language: Vietnamese  
+      language: Vietnamese
+
+  - name: melt_lm_modeling
+    display_name: Language model modeling
+    description: Scenarios for language model modeling tasks.
+    category: Language Modeling
+    subgroups:
+      - melt_lm_mask_filling_mlqa
+      - melt_lm_spelling_correction_vsec
 
   - name: melt_lm_mask_filling_mlqa
     display_name: MLQA
@@ -1130,6 +1153,14 @@ run_groups:
       when: "?"
       language: Vietnamese
 
+  - name: melt_knowledge
+    display_name: Knowledge extraction
+    description: Scenarios for knowledge extraction tasks.
+    category: Common Knowledge Answering
+    subgroups:
+      - melt_knowledge_zalo
+      - melt_knowledge_vimmrc
+
   - name: melt_knowledge_zalo
     display_name: ZaloE2E
     short_display_name: ZaloE2E
@@ -1165,6 +1196,14 @@ run_groups:
       who: "?"
       when: "?"
       language: Vietnamese
+
+  - name: melt_toxicity_detection
+    display_name: Toxicity detection
+    description: Scenarios for toxicity detection tasks.
+    category: Toxicity Detection
+    subgroups:
+      - melt_toxicity_detection_vihsd
+      - melt_toxicity_detection_victsd
 
   - name: melt_toxicity_detection_vihsd
     display_name: ViHSD
@@ -1211,6 +1250,14 @@ run_groups:
       who: "?"
       when: "?"
       language: Vietnamese
+
+  - name: melt_information_retrieval
+    display_name: Information retrieval
+    description: Scenarios for information retrieval tasks.
+    category: Information Retrieval
+    subgroups:
+      - melt_information_retrieval_mmarco
+      - melt_information_retrieval_mrobust
 
   - name: melt_information_retrieval_mmarco
     display_name: MARCO
