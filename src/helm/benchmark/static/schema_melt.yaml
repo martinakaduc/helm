@@ -362,10 +362,6 @@ metrics:
     display_name: SummaC
     description: Faithfulness scores based on the SummaC method of [Laban et al. (2022)](https://aclanthology.org/2022.tacl-1.10/).
     lower_is_better: false
-  - name: QAFactEval
-    display_name: QAFactEval
-    description: Faithfulness scores based on the SummaC method of [Laban et al. (2022)](https://aclanthology.org/2022.tacl-1.10/).
-    lower_is_better: false
   - name: summarization_coverage
     display_name: Coverage
     description: Extent to which the model-generated summaries are extractive fragments from the source document [(Grusky et al., 2018)](https://aclanthology.org/N18-1065/).
@@ -386,18 +382,6 @@ metrics:
   - name: BERTScore-F
     display_name: BERTScore (F1)
     description: Average BERTScore F1 [(Zhang et al., 2020)](https://openreview.net/pdf?id=SkeHuCVFDr) between model generation and reference summary.
-    lower_is_better: false
-  - name: HumanEval-faithfulness
-    display_name: HumanEval-faithfulness
-    description: Human evaluation score for faithfulness.
-    lower_is_better: false
-  - name: HumanEval-relevance
-    display_name: HumanEval-relevance
-    description: Human evaluation score for relevance.
-    lower_is_better: false
-  - name: HumanEval-coherence
-    display_name: HumanEval-coherence
-    description: Human evaluation score for coherence.
     lower_is_better: false
     
   # Bias metrics:
@@ -965,8 +949,6 @@ run_groups:
       - calibration
       - robustness
       - fairness
-      - bias
-      - toxicity
       - efficiency
       - general_information
     environment:
@@ -988,8 +970,6 @@ run_groups:
       - calibration
       - robustness
       - fairness
-      - bias
-      - toxicity
       - efficiency
       - general_information
     environment:
@@ -1019,8 +999,6 @@ run_groups:
       - calibration
       - robustness
       - fairness
-      - bias
-      - toxicity
       - efficiency
       - general_information
     environment:
@@ -1042,8 +1020,6 @@ run_groups:
       - calibration
       - robustness
       - fairness
-      - bias
-      - toxicity
       - efficiency
       - general_information
     environment:
@@ -1116,8 +1092,6 @@ run_groups:
       - calibration
       - robustness
       - fairness
-      - bias
-      - toxicity
       - efficiency
       - general_information
     environment:
@@ -1139,8 +1113,6 @@ run_groups:
       - calibration
       - robustness
       - fairness
-      - bias
-      - toxicity
       - efficiency
       - general_information
     environment:
@@ -1214,8 +1186,6 @@ run_groups:
       - calibration
       - robustness
       - fairness
-      - bias
-      - toxicity
       - efficiency
       - general_information
     environment:
@@ -1237,8 +1207,6 @@ run_groups:
       - calibration
       - robustness
       - fairness
-      - bias
-      - toxicity
       - efficiency
       - general_information
     environment:
@@ -1267,8 +1235,6 @@ run_groups:
       - accuracy
       - robustness
       - fairness
-      - bias
-      - toxicity
       - efficiency
       - general_information
     environment:
@@ -1289,8 +1255,6 @@ run_groups:
       - accuracy
       - robustness
       - fairness
-      - bias
-      - toxicity
       - efficiency
       - general_information
     environment:
