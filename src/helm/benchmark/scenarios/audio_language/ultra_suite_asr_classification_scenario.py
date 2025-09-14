@@ -81,7 +81,7 @@ class UltraSuiteASRClassificationScenario(Scenario):
         super().__init__()
         self.dataset_name = dataset_name
         if dataset_name in ["enni", "lenormand", "percept-gfta"]:
-            self.dataset_repo = "SAA-Lab/SLPHelmDatasetA"
+            self.dataset_repo = "SAA-Lab/SLPHelmDataset"
         elif dataset_name == "ultrasuite":
             self.dataset_repo = "SAA-Lab/SLPHelmUltraSuite"
         else:
@@ -119,9 +119,7 @@ class UltraSuiteASRClassificationScenario(Scenario):
             # Get the correct answer and convert to label
             answer = annotation["transcription"]
             # Create references for each option
-            references: List[Reference] = []
-            reference = Reference(Output(text=answer), tags=[CORRECT_TAG])
-            references.append(reference)
+            references: List[Reference] = [Reference(Output(text=answer), tags=[CORRECT_TAG])]
 
             # Create the input with audio and instruction
             content = [

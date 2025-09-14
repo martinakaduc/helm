@@ -115,7 +115,7 @@ def get_ultra_suite_disorder_breakdown_run_spec(fewshot: bool = False) -> RunSpe
 @run_spec_function("ultra_suite_asr_classification")
 def get_ultra_suite_asr_classification_run_spec(fewshot: bool = False) -> RunSpec:
     scenario_spec = ScenarioSpec(
-        class_name="helm.benchmark.scenarios.audio_language.ultra_suite_asr_classification.UltraSuiteASRClassificationScenario",
+        class_name="helm.benchmark.scenarios.audio_language.ultra_suite_asr_classification_scenario.UltraSuiteASRClassificationScenario",
         args={
             "dataset_name": "ultrasuite",
         },
@@ -130,7 +130,7 @@ def get_ultra_suite_asr_classification_run_spec(fewshot: bool = False) -> RunSpe
             Only respond with the text transcription, no other text or commentary or punctuations.
             """,
         max_tokens=10,
-        max_train_instances=5 if fewshot else 0
+        max_train_instances=5 if fewshot else 0,
     )
     metric_specs: List[MetricSpec] = audio_classification_metric_specs()
     run_spec_name: str = "ultra_suite_asr_classification"
@@ -146,7 +146,7 @@ def get_ultra_suite_asr_classification_run_spec(fewshot: bool = False) -> RunSpe
 @run_spec_function("ultra_suite_asr_transcription")
 def get_ultra_suite_asr_transcription_run_spec(fewshot: bool = False) -> RunSpec:
     scenario_spec = ScenarioSpec(
-        class_name="helm.benchmark.scenarios.audio_language.ultra_suite_asr_classification.UltraSuiteASRClassificationScenario",
+        class_name="helm.benchmark.scenarios.audio_language.ultra_suite_asr_transcription_scenario.UltraSuiteASRTranscriptionScenario",
         args={
             "dataset_name": "ultrasuite",
         },
@@ -178,7 +178,7 @@ def get_ultra_suite_asr_transcription_run_spec(fewshot: bool = False) -> RunSpec
 @run_spec_function("ultra_suite_disorder_symptoms")
 def get_ultra_suite_disorder_symptoms_run_spec(fewshot: bool = False) -> RunSpec:
     scenario_spec = ScenarioSpec(
-        class_name="helm.benchmark.scenarios.audio_language.ultra_suite_disorder_tags_scenario.UltraSuiteDisorderTagsScenario",
+        class_name="helm.benchmark.scenarios.audio_language.ultra_suite_disorder_symptoms_scenario.UltraSuiteDisorderSymptomsScenario",
         args={
             "dataset_name": "ultrasuite",
         },

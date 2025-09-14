@@ -66,13 +66,17 @@ class GraniteSpeechClient(CachingClient):
             loaded_model_processor = _models[model_name]
             if loaded_model_processor is None:
                 hlog(f"Loading model {model_name} and caching in memory...")
-                model = AutoModelForSpeechSeq2Seq.from_pretrained(
-                    model_name,
-                    device_map=self._device,
-                    trust_remote_code=True,
-                    attn_implementation="flash_attention_2",
-                    torch_dtype=torch.bfloat16,
-                ).eval()
+                model = (
+                    AutoModelForSpeechSeq2Seq.from_pretrained(
+                        model_name,
+                        device_map=self._device,
+                        trust_remote_code=True,
+                        attn_implementation="flash_attention_2",
+                        torch_dtype=torch.bfloat16,
+                    )
+                    .to(self._device)
+                    .eval()
+                )
                 tokenizer = AutoProcessor.from_pretrained(
                     model_name,
                     trust_remote_code=True,

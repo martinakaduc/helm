@@ -32,16 +32,26 @@ _models: Dict[str, Optional[LoadedQwen2_5OmniModelProcessor]] = {
     "SAA-Lab/Qwen2.5-Omni-3B-UltraSuite": None,
     "SAA-Lab/Qwen2.5-Omni-7B-UltraSuite-woA": None,
     "SAA-Lab/Qwen2.5-Omni-3B-UltraSuite-woA": None,
-    "finetuning_results/iter_1": None,
-    "finetuning_results/iter_2": None,
-    "finetuning_results/iter_3": None,
-    "finetuning_results/iter_4": None,
-    "finetuning_results/iter_5": None,
-    "finetuning_results/iter_6": None,
-    "finetuning_results/iter_7": None,
-    "finetuning_results/iter_8": None,
-    "finetuning_results/iter_9": None,
-    "finetuning_results/iter_10": None,
+    "finetuning_results/qwen2.5-omni-3b-iter_1": None,
+    "finetuning_results/qwen2.5-omni-3b-iter_2": None,
+    "finetuning_results/qwen2.5-omni-3b-iter_3": None,
+    "finetuning_results/qwen2.5-omni-3b-iter_4": None,
+    "finetuning_results/qwen2.5-omni-3b-iter_5": None,
+    "finetuning_results/qwen2.5-omni-3b-iter_6": None,
+    "finetuning_results/qwen2.5-omni-3b-iter_7": None,
+    "finetuning_results/qwen2.5-omni-3b-iter_8": None,
+    "finetuning_results/qwen2.5-omni-3b-iter_9": None,
+    "finetuning_results/qwen2.5-omni-3b-iter_10": None,
+    "finetuning_results/qwen2.5-omni-7b-iter_1": None,
+    "finetuning_results/qwen2.5-omni-7b-iter_2": None,
+    "finetuning_results/qwen2.5-omni-7b-iter_3": None,
+    "finetuning_results/qwen2.5-omni-7b-iter_4": None,
+    "finetuning_results/qwen2.5-omni-7b-iter_5": None,
+    "finetuning_results/qwen2.5-omni-7b-iter_6": None,
+    "finetuning_results/qwen2.5-omni-7b-iter_7": None,
+    "finetuning_results/qwen2.5-omni-7b-iter_8": None,
+    "finetuning_results/qwen2.5-omni-7b-iter_9": None,
+    "finetuning_results/qwen2.5-omni-7b-iter_10": None,
 }
 
 
@@ -77,7 +87,7 @@ class Qwen2_5OmniAudioLMClient(CachingClient):
             model_name = "SAA-Lab/Qwen2.5-Omni-7B-UltraSuite-woA"
         elif helm_model_name == "Qwen2.5-Omni-3B-UltraSuite-woA":
             model_name = "SAA-Lab/Qwen2.5-Omni-3B-UltraSuite-woA"
-        elif helm_model_name.startswith("iter_"):
+        elif "iter_" in helm_model_name:
             model_name = f"finetuning_results/{helm_model_name}"
         else:
             raise ValueError(f"Unhandled model name: {helm_model_name}")
@@ -97,9 +107,6 @@ class Qwen2_5OmniAudioLMClient(CachingClient):
                     ).eval()
                 else:
                     # Use default attention for other GPUs
-                    # Note: The model will still run on A100 and H100 GPUs, but without flash attention 2
-                    # This is a temporary workaround until flash attention 2 is supported on all GPUs
-                    # See
                     model = Qwen2_5OmniModel.from_pretrained(
                         model_name,
                         torch_dtype=torch.float16,
@@ -192,7 +199,7 @@ class Qwen2_5OmniAudioLMClient(CachingClient):
                             clean_up_tokenization_spaces=False,
                         )
                         # The processor of Qwen2-Audio-Instruct consists an AutoTokenizer and a WhisperFeatureExtractor
-                        tokens: List[str] = tokenizer.tokenizer.tokenize(completion)
+                        tokens: List[str] = tokenizer.tokenizer.tokenize(completion)  # type: ignore
                         return {"output": (completion, tokens)}
 
                     # Include the prompt and model name in the cache key
