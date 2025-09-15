@@ -4,20 +4,14 @@ from helm.benchmark.adaptation.adapter_spec import (
     ADAPT_MULTIPLE_CHOICE_JOINT_MULTIMODAL,
     AdapterSpec,
 )
-from helm.benchmark.metrics.common_metric_specs import (
-    get_basic_generation_metric_specs,
-    get_basic_metric_specs,
-    get_multiple_choice_classification_metric_specs,
+from helm.benchmark.metrics.common_metric_specs import get_basic_generation_metric_specs
+from helm.benchmark.metrics.ultra_suite_metric_specs import (
+    get_audio_classification_metric_specs,
+    get_ultra_suite_asr_classification_metric_specs,
 )
 from helm.benchmark.metrics.metric import MetricSpec
 from helm.benchmark.run_spec import RunSpec, run_spec_function
 from helm.benchmark.scenarios.scenario import ScenarioSpec
-
-
-def audio_classification_metric_specs() -> List[MetricSpec]:
-    return get_multiple_choice_classification_metric_specs() + get_basic_metric_specs(
-        ["exact_match", "quasi_exact_match"]
-    )
 
 
 def _get_multiple_choice_joint_adapter_spec(
@@ -79,7 +73,7 @@ def get_ultra_suite_classification_run_spec(fewshot: bool = False) -> RunSpec:
     adapter_spec: AdapterSpec = _get_multiple_choice_joint_adapter_spec(
         input_noun=None, output_noun="Answer", max_train_instances=5 if fewshot else 0
     )
-    metric_specs: List[MetricSpec] = audio_classification_metric_specs()
+    metric_specs: List[MetricSpec] = get_audio_classification_metric_specs()
     run_spec_name: str = "ultra_suite_classification"
     return RunSpec(
         name=f"{run_spec_name}:fewshot={fewshot}",
@@ -101,7 +95,7 @@ def get_ultra_suite_disorder_breakdown_run_spec(fewshot: bool = False) -> RunSpe
     adapter_spec: AdapterSpec = _get_multiple_choice_joint_adapter_spec(
         input_noun=None, output_noun="Answer", max_train_instances=5 if fewshot else 0
     )
-    metric_specs: List[MetricSpec] = audio_classification_metric_specs()
+    metric_specs: List[MetricSpec] = get_audio_classification_metric_specs()
     run_spec_name: str = "ultra_suite_classification_breakdown"
     return RunSpec(
         name=f"{run_spec_name}:fewshot={fewshot}",
@@ -129,10 +123,10 @@ def get_ultra_suite_asr_classification_run_spec(fewshot: bool = False) -> RunSpe
             Only transcribe based on the words that the child actually says.
             Only respond with the text transcription, no other text or commentary or punctuations.
             """,
-        max_tokens=10,
+        max_tokens=50,
         max_train_instances=5 if fewshot else 0,
     )
-    metric_specs: List[MetricSpec] = audio_classification_metric_specs()
+    metric_specs: List[MetricSpec] = get_ultra_suite_asr_classification_metric_specs()
     run_spec_name: str = "ultra_suite_asr_classification"
     return RunSpec(
         name=f"{run_spec_name}:fewshot={fewshot}",
@@ -186,7 +180,7 @@ def get_ultra_suite_disorder_symptoms_run_spec(fewshot: bool = False) -> RunSpec
     adapter_spec: AdapterSpec = _get_multiple_choice_joint_adapter_spec(
         input_noun=None, output_noun="Answer", max_train_instances=5 if fewshot else 0
     )
-    metric_specs: List[MetricSpec] = audio_classification_metric_specs()
+    metric_specs: List[MetricSpec] = get_audio_classification_metric_specs()
     run_spec_name: str = "ultra_suite_disorder_symptoms"
     return RunSpec(
         name=f"{run_spec_name}:fewshot={fewshot}",

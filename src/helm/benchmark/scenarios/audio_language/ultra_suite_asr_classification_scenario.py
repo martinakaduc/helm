@@ -117,9 +117,11 @@ class UltraSuiteASRClassificationScenario(Scenario):
                 annotation = json.load(f)
 
             # Get the correct answer and convert to label
-            answer = annotation["transcription"]
+            transcription = annotation["transcription"]
+            disorder_class = annotation["disorder_class"]
+
             # Create references for each option
-            references: List[Reference] = [Reference(Output(text=answer), tags=[CORRECT_TAG])]
+            references: List[Reference] = [Reference(Output(text=disorder_class), tags=[CORRECT_TAG])]
 
             # Create the input with audio and instruction
             content = [
@@ -127,6 +129,8 @@ class UltraSuiteASRClassificationScenario(Scenario):
             ]
 
             input = Input(multimedia_content=MultimediaObject(content))
-            instances.append(Instance(input=input, references=references, split=split))
+            instances.append(
+                Instance(input=input, references=references, split=split, extra_data={"transcription": transcription})
+            )
 
         return instances
