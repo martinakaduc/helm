@@ -3,6 +3,7 @@ import os
 import json
 
 from tqdm import tqdm
+from datasets import load_dataset
 from huggingface_hub import snapshot_download
 from helm.benchmark.scenarios.scenario import (
     Scenario,
@@ -15,6 +16,7 @@ from helm.benchmark.scenarios.scenario import (
 )
 from helm.common.media_object import MediaObject, MultimediaObject
 from helm.common.general import ensure_directory_exists
+from helm.common.audio_utils import ensure_audio_file_exists_from_array
 
 
 def find_audio_json_pairs(directory: str) -> List[Tuple[str, str]]:
@@ -68,9 +70,6 @@ class UltraSuiteASRClassificationScenario(Scenario):
     description = "A scenario for evaluating speech disorders in children"
     tags = ["audio", "classification", "speech_disorder", "asr"]
 
-    # Classification options
-    options: List[str] = ["Healthy", "Unhealthy"]
-
     def __init__(self, dataset_name: str):
         """
         Initializes the question answering scenario.
@@ -83,7 +82,7 @@ class UltraSuiteASRClassificationScenario(Scenario):
         if dataset_name in ["enni", "lenormand", "percept-gfta"]:
             self.dataset_repo = "SAA-Lab/SLPHelmDataset"
         elif dataset_name == "ultrasuite":
-            self.dataset_repo = "SAA-Lab/SLPHelmUltraSuite"
+            self.dataset_repo = "SAA-Lab/SLPHelmUltraSuitePlus"
         else:
             raise ValueError(f"Unsupported dataset name: {dataset_name}")
 
@@ -100,37 +99,74 @@ class UltraSuiteASRClassificationScenario(Scenario):
         instances: List[Instance] = []
         split: str = TEST_SPLIT
 
-        # Find all pairs of audio and JSON files
-        data_path = snapshot_download(repo_id=self.dataset_repo, repo_type="dataset")
-        if self.dataset_name == "enni":
-            data_path = os.path.join(data_path, "ENNI")
-        elif self.dataset_name == "lenormand":
-            data_path = os.path.join(data_path, "LeNormand")
-        elif self.dataset_name == "percept-gfta":
-            data_path = os.path.join(data_path, "PERCEPT-GFTA")
-        pairs = find_audio_json_pairs(data_path)
+        if self.dataset_name == "ultrasuite":
+            audio_save_dir = os.path.join(output_path, "audio_files")
+            os.makedirs(audio_save_dir, exist_ok=True)
 
-        for audio_path, json_path in tqdm(pairs):
+            print(f"Downloading {self.dataset_repo} dataset...")
+            dataset = load_dataset(self.dataset_repo)
 
-            # Load the annotation
-            with open(json_path, "r") as f:
-                annotation = json.load(f)
+            for idx, row in enumerate(tqdm(dataset["train"])):
+                # Get the correct answer and convert to label
+                label = row["disorder_class"]
+                transcription = row["transcription"]
 
-            # Get the correct answer and convert to label
-            transcription = annotation["transcription"]
-            disorder_class = annotation["disorder_class"]
+                unique_id = str(idx)
+                local_audio_name = f"{label}_{unique_id}.mp3"
+                local_audio_path = os.path.join(audio_save_dir, local_audio_name)
+                ensure_audio_file_exists_from_array(
+                    local_audio_path, row["audio"]["array"], row["audio"]["sampling_rate"]
+                )
 
-            # Create references for each option
-            references: List[Reference] = [Reference(Output(text=disorder_class), tags=[CORRECT_TAG])]
+                # Create references for each option
+                references: List[Reference] = [Reference(Output(text=label), tags=[CORRECT_TAG])]
 
-            # Create the input with audio and instruction
-            content = [
-                MediaObject(content_type="audio/mpeg", location=audio_path),
-            ]
+                # Create the input with audio and instruction
+                content = [
+                    MediaObject(content_type="audio/mpeg", location=local_audio_path),
+                ]
 
-            input = Input(multimedia_content=MultimediaObject(content))
-            instances.append(
-                Instance(input=input, references=references, split=split, extra_data={"transcription": transcription})
-            )
+                input = Input(multimedia_content=MultimediaObject(content))
+                instances.append(
+                    Instance(
+                        input=input, references=references, split=split, extra_data={"transcription": transcription}
+                    )
+                )
+
+        else:
+            # Find all pairs of audio and JSON files
+            data_path = snapshot_download(repo_id=self.dataset_repo, repo_type="dataset")
+            if self.dataset_name == "enni":
+                data_path = os.path.join(data_path, "ENNI")
+            elif self.dataset_name == "lenormand":
+                data_path = os.path.join(data_path, "LeNormand")
+            elif self.dataset_name == "percept-gfta":
+                data_path = os.path.join(data_path, "PERCEPT-GFTA")
+            pairs = find_audio_json_pairs(data_path)
+
+            for audio_path, json_path in tqdm(pairs):
+
+                # Load the annotation
+                with open(json_path, "r") as f:
+                    annotation = json.load(f)
+
+                # Get the correct answer and convert to label
+                label = annotation["disorder_class"]
+                transcription = annotation["transcription"]
+
+                # Create references for each option
+                references: List[Reference] = [Reference(Output(text=label), tags=[CORRECT_TAG])]
+
+                # Create the input with audio and instruction
+                content = [
+                    MediaObject(content_type="audio/mpeg", location=audio_path),
+                ]
+
+                input = Input(multimedia_content=MultimediaObject(content))
+                instances.append(
+                    Instance(
+                        input=input, references=references, split=split, extra_data={"transcription": transcription}
+                    )
+                )
 
         return instances

@@ -3,6 +3,7 @@ import os
 import json
 
 from tqdm import tqdm
+from datasets import load_dataset
 from huggingface_hub import snapshot_download
 from helm.benchmark.scenarios.scenario import (
     Scenario,
@@ -15,6 +16,7 @@ from helm.benchmark.scenarios.scenario import (
 )
 from helm.common.media_object import MediaObject, MultimediaObject
 from helm.common.general import ensure_directory_exists
+from helm.common.audio_utils import ensure_audio_file_exists_from_array
 
 
 def find_audio_json_pairs(directory: str) -> List[Tuple[str, str]]:
@@ -75,7 +77,7 @@ class UltraSuiteClassificationScenario(Scenario):
         if dataset_name in ["enni", "lenormand", "percept-gfta"]:
             self.dataset_repo = "SAA-Lab/SLPHelmDataset"
         elif dataset_name == "ultrasuite":
-            self.dataset_repo = "SAA-Lab/SLPHelmUltraSuite"
+            self.dataset_repo = "SAA-Lab/SLPHelmUltraSuitePlus"
         else:
             raise ValueError(f"Unsupported dataset name: {dataset_name}")
 
@@ -105,43 +107,79 @@ class UltraSuiteClassificationScenario(Scenario):
         split: str = TEST_SPLIT
         print(f"Output path: {os.path.abspath(output_path)}")
 
-        # Find all pairs of audio and JSON files
-        data_path = snapshot_download(repo_id=self.dataset_repo, repo_type="dataset")
-        if self.dataset_name == "enni":
-            data_path = os.path.join(data_path, "ENNI")
-        elif self.dataset_name == "lenormand":
-            data_path = os.path.join(data_path, "LeNormand")
-        elif self.dataset_name == "percept-gfta":
-            data_path = os.path.join(data_path, "PERCEPT-GFTA")
-        pairs = find_audio_json_pairs(data_path)
-        print(f"Num pairs: {len(pairs)}")
+        if self.dataset_name == "ultrasuite":
+            audio_save_dir = os.path.join(output_path, "audio_files")
+            os.makedirs(audio_save_dir, exist_ok=True)
 
-        for audio_path, json_path in tqdm(pairs):
-            # Load the annotation
-            with open(json_path, "r") as f:
-                annotation = json.load(f)
+            print(f"Downloading {self.dataset_repo} dataset...")
+            dataset = load_dataset(self.dataset_repo)
 
-            # Get the correct answer and convert to label
-            answer = annotation["disorder_class"]
-            words = annotation["transcription"]
-            # Create references for each option
-            references: List[Reference] = []
-            correct_label = 0
-            for option in ["typically_developing", "speech_disorder"]:
-                reference = Reference(Output(text=option), tags=[CORRECT_TAG] if option == answer else [])
-                references.append(reference)
-                if option == answer:
-                    correct_label += 1
-            if correct_label == 0:
-                continue
+            for idx, row in enumerate(tqdm(dataset["train"])):
+                # Load the annotation
+                label = row["disorder_class"]
+                transcription = row["transcription"]
 
-            # Create the input with audio and instruction
-            content = [
-                MediaObject(content_type="audio/mpeg", location=audio_path),
-                MediaObject(content_type="text/plain", text=self.get_instruction(words)),
-            ]
+                unique_id = str(idx)
+                local_audio_name = f"{label}_{unique_id}.mp3"
+                local_audio_path = os.path.join(audio_save_dir, local_audio_name)
+                ensure_audio_file_exists_from_array(
+                    local_audio_path, row["audio"]["array"], row["audio"]["sampling_rate"]
+                )
 
-            input = Input(multimedia_content=MultimediaObject(content))
-            instances.append(Instance(input=input, references=references, split=split))
+                # Create references for each option
+                references: List[Reference] = []
+                options = ["typically_developing", "speech_disorder"]
+                if label not in options:
+                    continue
+                for option in options:
+                    reference = Reference(Output(text=option), tags=[CORRECT_TAG] if option == label else [])
+                    references.append(reference)
+
+                # Create the input with audio and instruction
+                content = [
+                    MediaObject(content_type="audio/mpeg", location=local_audio_path),
+                    MediaObject(content_type="text/plain", text=self.get_instruction(transcription)),
+                ]
+
+                input = Input(multimedia_content=MultimediaObject(content))
+                instances.append(Instance(input=input, references=references, split=split))
+        else:
+            # Find all pairs of audio and JSON files
+            data_path = snapshot_download(repo_id=self.dataset_repo, repo_type="dataset")
+            if self.dataset_name == "enni":
+                data_path = os.path.join(data_path, "ENNI")
+            elif self.dataset_name == "lenormand":
+                data_path = os.path.join(data_path, "LeNormand")
+            elif self.dataset_name == "percept-gfta":
+                data_path = os.path.join(data_path, "PERCEPT-GFTA")
+            pairs = find_audio_json_pairs(data_path)
+            print(f"Num pairs: {len(pairs)}")
+
+            for audio_path, json_path in tqdm(pairs):
+                # Load the annotation
+                with open(json_path, "r") as f:
+                    annotation = json.load(f)
+
+                # Load the annotation
+                label = annotation["disorder_class"]
+                transcription = annotation["transcription"]
+
+                # Create references for each option
+                references: List[Reference] = []
+                options = ["typically_developing", "speech_disorder"]
+                if label not in options:
+                    continue
+                for option in ["typically_developing", "speech_disorder"]:
+                    reference = Reference(Output(text=option), tags=[CORRECT_TAG] if option == label else [])
+                    references.append(reference)
+
+                # Create the input with audio and instruction
+                content = [
+                    MediaObject(content_type="audio/mpeg", location=audio_path),
+                    MediaObject(content_type="text/plain", text=self.get_instruction(transcription)),
+                ]
+
+                input = Input(multimedia_content=MultimediaObject(content))
+                instances.append(Instance(input=input, references=references, split=split))
 
         return instances
