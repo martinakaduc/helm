@@ -73,7 +73,7 @@ class UltraSuiteASRTranscriptionScenario(Scenario):
         if dataset_name in ["enni", "lenormand", "percept-gfta"]:
             self.dataset_repo = "SAA-Lab/SLPHelmDataset"
         elif dataset_name == "ultrasuite":
-            self.dataset_repo = "SAA-Lab/SLPHelmUltraSuite"
+            self.dataset_repo = "SAA-Lab/SLPHelmUltraSuitePlus"
         else:
             raise ValueError(f"Unsupported dataset name: {dataset_name}")
 
